@@ -15,6 +15,12 @@ type Handler struct {
 	service Service
 }
 
+func NewHandler(service *Service) *Handler {
+	return &Handler{
+		service: *service,
+	}
+}
+
 func (h *Handler) CreateEvent() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var event structs.CreateEventInput
@@ -59,7 +65,7 @@ func (h *Handler) GetEventByID() http.HandlerFunc {
 		request := r.PathValue("id")
 		id, parseErr := strconv.ParseInt(request, 10, 64)
 		if parseErr != nil {
-			log.Println("invalid event id")
+			log.Println("invalid event id:", parseErr)
 			helper.WriteErrorResponse(w, "invalid event id", http.StatusBadRequest)
 			return
 		}
@@ -67,6 +73,7 @@ func (h *Handler) GetEventByID() http.HandlerFunc {
 		event, getEventErr := h.service.GetEventByID(r.Context(), id)
 		if errors.Is(getEventErr, sql.ErrNoRows) {
 			helper.WriteErrorResponse(w, getEventErr.Error(), http.StatusNotFound)
+			return
 		}
 		if getEventErr != nil {
 			helper.WriteErrorResponse(w, getEventErr.Error(), http.StatusInternalServerError)

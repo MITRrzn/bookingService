@@ -11,6 +11,12 @@ type Service struct {
 	repo Repository
 }
 
+func NewService(repo Repository) *Service {
+	return &Service{
+		repo: repo,
+	}
+}
+
 func (s *Service) CreateEvent(ctx context.Context, input structs.CreateEventInput) (structs.Event, error) {
 	validationErr := validateCreateEventInput(input)
 	if validationErr != nil {

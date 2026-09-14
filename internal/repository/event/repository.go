@@ -12,6 +12,17 @@ type Repository struct {
 	db *sql.DB
 }
 
+func (r *Repository) GetActiveEvents(ctx context.Context) ([]structs.Event, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func NewRepository(db *sql.DB) *Repository {
+	return &Repository{
+		db: db,
+	}
+}
+
 func (r *Repository) CreateEvent(ctx context.Context, input structs.CreateEventInput) (structs.Event, error) {
 	var event structs.Event
 
@@ -54,7 +65,7 @@ func (r *Repository) GetEventByID(ctx context.Context, id int64) (structs.Event,
 		&event.CreatedAt,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
-		return structs.Event{}, errors.New("event not found")
+		return structs.Event{}, sql.ErrNoRows
 	}
 
 	if err != nil {

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bookingService/internal/database/psql"
 	"bookingService/internal/event"
+	eventRepository "bookingService/internal/repository/event"
 	"context"
 	"errors"
 	"fmt"
@@ -17,11 +19,20 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
+	db, err := psql.PsqlConnect()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	eventRepo := eventRepository.NewRepository(db)
+	eventService := event.NewService(eventRepo)
+	eventHandler := event.NewHandler(eventService)
+
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("POST /events", event.AddNewEvent())
-	mux.HandleFunc("GET /events", event.GetActiveEvents())
-	mux.HandleFunc("GET /events/{id}", event.GetEventById())
+	mux.HandleFunc("POST /events", eventHandler.CreateEvent())
+	//mux.HandleFunc("GET /events", event.GetActiveEvents())
+	mux.HandleFunc("GET /events/{id}", eventHandler.GetEventByID())
 
 	port := os.Getenv("APP_PORT")
 	log.Println("Starting server at port", port)
