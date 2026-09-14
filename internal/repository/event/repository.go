@@ -53,8 +53,12 @@ func (r *Repository) GetEventByID(ctx context.Context, id int64) (structs.Event,
 		&event.StartsAt,
 		&event.CreatedAt,
 	)
-	if err != nil {
+	if errors.Is(err, sql.ErrNoRows) {
 		return structs.Event{}, errors.New("event not found")
+	}
+
+	if err != nil {
+		return structs.Event{}, fmt.Errorf("failed get event by id: %w", err)
 	}
 
 	return event, nil

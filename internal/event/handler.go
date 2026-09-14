@@ -3,6 +3,7 @@ package event
 import (
 	"bookingService/internal/helper"
 	"bookingService/internal/structs"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"log"
@@ -56,22 +57,26 @@ func (h *Handler) CreateEvent() http.HandlerFunc {
 func (h *Handler) GetEventByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		request := r.PathValue("id")
-		id, err := strconv.ParseInt(request, 10, 64)
-		if err != nil {
-			log.Println("parse id error:", err)
-			helper.WriteErrorResponse(w, err.Error(), http.StatusBadRequest)
+		id, parseErr := strconv.ParseInt(request, 10, 64)
+		if parseErr != nil {
+			log.Println("invalid event id")
+			helper.WriteErrorResponse(w, "invalid event id", http.StatusBadRequest)
 			return
 		}
 
 		event, getEventErr := h.service.GetEventByID(r.Context(), id)
+		if errors.Is(getEventErr, sql.ErrNoRows) {
+			helper.WriteErrorResponse(w, getEventErr.Error(), http.StatusNotFound)
+		}
 		if getEventErr != nil {
 			helper.WriteErrorResponse(w, getEventErr.Error(), http.StatusInternalServerError)
+			return
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
+		w.WriteHeader(http.StatusOK)
 		encodeErr := json.NewEncoder(w).Encode(structs.SuccessResponse{
-			Success: "created",
+			Success: "OK",
 			Event:   event,
 		})
 		if encodeErr != nil {
