@@ -10,6 +10,7 @@ type Service struct {
 }
 
 func (s *Service) CreateEvent(ctx context.Context, input structs.CreateEventInput) (structs.Event, error) {
+	return s.repo.CreateEvent(ctx, input)
 }
 
 //func (s *Service) GetEvents(ctx context.Context) ([]Event, error) {
