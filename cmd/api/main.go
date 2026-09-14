@@ -36,7 +36,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("POST /events", eventHandler.CreateEvent)
-	//mux.HandleFunc("GET /events", event.GetActiveEvents())
+	mux.HandleFunc("GET /events", eventHandler.GetEvents)
 	mux.HandleFunc("GET /events/{id}", eventHandler.GetEventByID)
 
 	port := os.Getenv("APP_PORT")

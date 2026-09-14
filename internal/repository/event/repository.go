@@ -25,23 +25,21 @@ func (r *Repository) GetActiveEvents(ctx context.Context) ([]structs.Event, erro
 		return nil, err
 	}
 
-	defer func(rows *sql.Rows) {
-		rowsCloseErr := rows.Close()
-		if rowsCloseErr != nil {
-			return
-		}
-	}(rows)
+	defer rows.Close()
 
 	var events []structs.Event
 	for rows.Next() {
 		var event structs.Event
 		scanErr := rows.Scan(&event.ID, &event.Name, &event.StartsAt)
 		if scanErr != nil {
-			return nil, err
+			return nil, scanErr
 		}
 
-		event.StartsAt.Format("2006-01-02 15:04:05")
 		events = append(events, event)
+	}
+
+	if rowsErr := rows.Err(); rowsErr != nil {
+		return nil, rowsErr
 	}
 
 	return events, nil
