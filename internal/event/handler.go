@@ -3,8 +3,8 @@ package event
 import (
 	"bookingService/internal/helper"
 	"bookingService/internal/structs"
-	"context"
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 )
@@ -24,9 +24,21 @@ func (h *Handler) CreateEvent() http.HandlerFunc {
 			return
 		}
 
-		createdEvent, createErr := h.service.CreateEvent(context.Background(), event)
+		createdEvent, createErr := h.service.CreateEvent(r.Context(), event)
+
 		if createErr != nil {
+			if errors.Is(createErr, ValidationError) {
+				helper.WriteErrorResponse(
+					w,
+					createErr.Error(),
+					http.StatusBadRequest,
+				)
+				return
+			}
+
 			log.Println("create event error:", createErr)
+			helper.WriteErrorResponse(w, "incorrect json format", http.StatusInternalServerError)
+			return
 		}
 
 		w.Header().Set("Content-Type", "application/json")

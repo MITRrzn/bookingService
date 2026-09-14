@@ -4,7 +4,7 @@ import (
 	"bookingService/internal/structs"
 	"context"
 	"database/sql"
-	"errors"
+	"fmt"
 )
 
 type Repository struct {
@@ -31,7 +31,7 @@ func (r *Repository) CreateEvent(ctx context.Context, input structs.CreateEventI
 	)
 
 	if err != nil {
-		return structs.Event{}, errors.New("error creating event")
+		return structs.Event{}, fmt.Errorf("create event: %w", err)
 	}
 
 	return event, nil
