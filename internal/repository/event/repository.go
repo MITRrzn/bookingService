@@ -13,11 +13,41 @@ type Repository struct {
 }
 
 func (r *Repository) GetActiveEvents(ctx context.Context) ([]structs.Event, error) {
-	//TODO implement me
-	panic("implement me")
+	rows, err := r.db.QueryContext(ctx,
+		`
+		SELECT id, name, starts_at FROM events
+		WHERE starts_at > NOW()
+		ORDER BY starts_at ASC
+		`,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer func(rows *sql.Rows) {
+		rowsCloseErr := rows.Close()
+		if rowsCloseErr != nil {
+			return
+		}
+	}(rows)
+
+	var events []structs.Event
+	for rows.Next() {
+		var event structs.Event
+		scanErr := rows.Scan(&event.ID, &event.Name, &event.StartsAt)
+		if scanErr != nil {
+			return nil, err
+		}
+
+		event.StartsAt.Format("2006-01-02 15:04:05")
+		events = append(events, event)
+	}
+
+	return events, nil
 }
 
-func NewRepository(db *sql.DB) *Repository {
+func NewEventRepo(db *sql.DB) *Repository {
 	return &Repository{
 		db: db,
 	}

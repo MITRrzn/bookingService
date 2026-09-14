@@ -51,8 +51,14 @@ func validateCreateEventInput(input structs.CreateEventInput) error {
 	return nil
 }
 
-//func (s *Service) GetEvents(ctx context.Context) ([]Event, error) {
-//}
+func (s *Service) GetEvents(ctx context.Context) ([]structs.Event, error) {
+	events, err := s.repo.GetActiveEvents(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return events, nil
+}
 
 func (s *Service) GetEventByID(ctx context.Context, id int64) (structs.Event, error) {
 	return s.repo.GetEventByID(ctx, id)

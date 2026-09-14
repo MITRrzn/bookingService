@@ -23,16 +23,21 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer func() {
+		if dbCloseErr := db.Close(); dbCloseErr != nil {
+			log.Printf("db close error: %v", dbCloseErr)
+		}
+	}()
 
-	eventRepo := eventRepository.NewRepository(db)
+	eventRepo := eventRepository.NewEventRepo(db)
 	eventService := event.NewService(eventRepo)
 	eventHandler := event.NewHandler(eventService)
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("POST /events", eventHandler.CreateEvent())
+	mux.HandleFunc("POST /events", eventHandler.CreateEvent)
 	//mux.HandleFunc("GET /events", event.GetActiveEvents())
-	mux.HandleFunc("GET /events/{id}", eventHandler.GetEventByID())
+	mux.HandleFunc("GET /events/{id}", eventHandler.GetEventByID)
 
 	port := os.Getenv("APP_PORT")
 	log.Println("Starting server at port", port)
