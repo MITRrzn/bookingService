@@ -7,6 +7,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type Handler struct {
@@ -27,12 +28,9 @@ func (h *Handler) CreateEvent() http.HandlerFunc {
 		createdEvent, createErr := h.service.CreateEvent(r.Context(), event)
 
 		if createErr != nil {
-			if errors.Is(createErr, ValidationError) {
-				helper.WriteErrorResponse(
-					w,
-					createErr.Error(),
-					http.StatusBadRequest,
-				)
+			var validationErr structs.ValidationError
+			if errors.As(createErr, &validationErr) {
+				helper.WriteErrorResponse(w, validationErr.Error(), http.StatusBadRequest)
 				return
 			}
 
@@ -55,8 +53,33 @@ func (h *Handler) CreateEvent() http.HandlerFunc {
 	}
 }
 
-// func (h *Handler) GetEvents() http.HandlerFunc {
-// }
+func (h *Handler) GetEventByID() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		request := r.PathValue("id")
+		id, err := strconv.ParseInt(request, 10, 64)
+		if err != nil {
+			log.Println("parse id error:", err)
+			helper.WriteErrorResponse(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 
-// func (h *Handler) GetEventByID() http.HandlerFunc {
+		event, getEventErr := h.service.GetEventByID(r.Context(), id)
+		if getEventErr != nil {
+			helper.WriteErrorResponse(w, getEventErr.Error(), http.StatusInternalServerError)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		encodeErr := json.NewEncoder(w).Encode(structs.SuccessResponse{
+			Success: "created",
+			Event:   event,
+		})
+		if encodeErr != nil {
+			log.Println(encodeErr)
+			return
+		}
+	}
+}
+
+// func (h *Handler) GetEvents() http.HandlerFunc {
 // }

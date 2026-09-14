@@ -4,6 +4,7 @@ import (
 	"bookingService/internal/structs"
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 )
 
@@ -32,6 +33,28 @@ func (r *Repository) CreateEvent(ctx context.Context, input structs.CreateEventI
 
 	if err != nil {
 		return structs.Event{}, fmt.Errorf("create event: %w", err)
+	}
+
+	return event, nil
+}
+
+func (r *Repository) GetEventByID(ctx context.Context, id int64) (structs.Event, error) {
+	var event structs.Event
+
+	err := r.db.QueryRowContext(
+		ctx,
+		`SELECT id, name, starts_at, created_at
+				FROM events
+				WHERE id = $1`,
+		id,
+	).Scan(
+		&event.ID,
+		&event.Name,
+		&event.StartsAt,
+		&event.CreatedAt,
+	)
+	if err != nil {
+		return structs.Event{}, errors.New("event not found")
 	}
 
 	return event, nil

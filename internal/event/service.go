@@ -16,6 +16,7 @@ func (s *Service) CreateEvent(ctx context.Context, input structs.CreateEventInpu
 	if validationErr != nil {
 		return structs.Event{}, validationErr
 	}
+	input.Name = strings.TrimSpace(input.Name)
 
 	return s.repo.CreateEvent(ctx, input)
 }
@@ -40,7 +41,6 @@ func validateCreateEventInput(input structs.CreateEventInput) error {
 			Message: "event name is too long",
 		}
 	}
-	input.Name = name
 
 	return nil
 }
@@ -48,5 +48,6 @@ func validateCreateEventInput(input structs.CreateEventInput) error {
 //func (s *Service) GetEvents(ctx context.Context) ([]Event, error) {
 //}
 
-//func (s *Service) GetEventByID(ctx context.Context, id int64) (Event, error) {
-//}
+func (s *Service) GetEventByID(ctx context.Context, id int64) (structs.Event, error) {
+	return s.repo.GetEventByID(ctx, id)
+}
