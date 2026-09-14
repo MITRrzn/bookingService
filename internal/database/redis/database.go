@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"time"
 
-	_ "github.com/lib/pq"
 	"github.com/redis/go-redis/v9"
 )
 
