@@ -1,7 +1,6 @@
 package event
 
 import (
-	"bookingService/internal/structs"
 	"context"
 	"strings"
 	"unicode/utf8"
@@ -31,19 +30,19 @@ func validateCreateEventInput(input CreateEventInput) error {
 	name := strings.TrimSpace(input.Name)
 
 	if name == "" {
-		return structs.ValidationError{
+		return ValidationError{
 			Message: "empty event name",
 		}
 	}
 
 	if utf8.RuneCountInString(name) < 3 {
-		return structs.ValidationError{
+		return ValidationError{
 			Message: "event name is too short",
 		}
 	}
 
 	if utf8.RuneCountInString(name) > 255 {
-		return structs.ValidationError{
+		return ValidationError{
 			Message: "event name is too long",
 		}
 	}

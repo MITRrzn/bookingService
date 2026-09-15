@@ -2,7 +2,6 @@ package event
 
 import (
 	"bookingService/internal/helper"
-	"bookingService/internal/structs"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -34,7 +33,7 @@ func (h *Handler) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	createdEvent, createErr := h.service.CreateEvent(r.Context(), event)
 
 	if createErr != nil {
-		var validationErr structs.ValidationError
+		var validationErr ValidationError
 		if errors.As(createErr, &validationErr) {
 			helper.WriteErrorResponse(w, validationErr.Error(), http.StatusBadRequest)
 			return

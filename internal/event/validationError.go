@@ -1,4 +1,4 @@
-package structs
+package event
 
 type ValidationError struct {
 	Message string

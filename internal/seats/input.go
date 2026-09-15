@@ -1,4 +1,4 @@
-package structs
+package seats
 
 type SeatInput struct {
 	Number string
