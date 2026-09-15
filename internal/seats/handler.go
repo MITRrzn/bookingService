@@ -33,7 +33,7 @@ func (h *Handler) GetSeatsByEventID(w http.ResponseWriter, r *http.Request) {
 
 	result, err := h.service.GetSeatsByEventID(r.Context(), id)
 	if err != nil {
-		helper.WriteErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		helper.WriteErrorResponse(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 

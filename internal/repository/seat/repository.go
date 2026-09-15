@@ -24,8 +24,8 @@ func (r *Repository) GetSeatsByEventID(ctx context.Context, eventID int64) ([]se
 	rows, queryErr := r.db.QueryContext(
 		ctx,
 		`
-		SELECT * FROM seats
-		WHERE id = $1
+		SELECT id, event_id, number, price, created_at FROM seats
+		WHERE event_id = $1
 		`,
 		eventID,
 	)
@@ -35,15 +35,19 @@ func (r *Repository) GetSeatsByEventID(ctx context.Context, eventID int64) ([]se
 	}
 	defer rows.Close()
 
-	var seatsList []seats.Seat
+	seatsList := make([]seats.Seat, 0)
 	for rows.Next() {
 		var model seats.Seat
-		scanErr := rows.Scan(&model)
+		scanErr := rows.Scan(&model.ID, &model.EventID, &model.Number, &model.Price, &model.CreatedAt)
 		if scanErr != nil {
 			return nil, scanErr
 		}
 
 		seatsList = append(seatsList, model)
+	}
+
+	if rowsErr := rows.Err(); rowsErr != nil {
+		return nil, rowsErr
 	}
 
 	return seatsList, nil
