@@ -1,10 +1,10 @@
 package seats
 
 type SeatService struct {
-	repo SeatsRepository
+	repo SeatRepository
 }
 
-func NewService(repo SeatsRepository) *SeatService {
+func NewService(repo SeatRepository) *SeatService {
 	return &SeatService{
 		repo: repo,
 	}

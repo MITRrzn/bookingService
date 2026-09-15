@@ -40,12 +40,12 @@ func main() {
 	mux.HandleFunc("GET /events", eventHandler.GetEvents)
 	mux.HandleFunc("GET /events/{id}", eventHandler.GetEventByID)
 
-	seatsRepo := seatsRepository.NewSeatsRepo(db)
+	seatsRepo := seatsRepository.NewSeatRepo(db)
 	seatsService := seats.NewService(seatsRepo)
 	seatsHandler := seats.NewHandler(seatsService)
 
 	mux.HandleFunc("POST /events/{eventID}/seats", seatsHandler.AddSeatsToEvent)
-	mux.HandleFunc("GET /events/{eventID}/seats", seatsHandler.GetSeatsByEventId)
+	mux.HandleFunc("GET /events/{eventID}/seats", seatsHandler.GetSeatsByEventID)
 
 	port := os.Getenv("APP_PORT")
 	log.Println("Starting server at port", port)

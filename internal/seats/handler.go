@@ -16,6 +16,6 @@ func (h *Handler) AddSeatsToEvent(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (h *Handler) GetSeatsByEventId(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetSeatsByEventID(w http.ResponseWriter, r *http.Request) {
 
 }

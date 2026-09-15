@@ -10,16 +10,16 @@ type Repository struct {
 	db *sql.DB
 }
 
-func NewSeatsRepo(db *sql.DB) *Repository {
+func NewSeatRepo(db *sql.DB) *Repository {
 	return &Repository{
 		db: db,
 	}
 }
 
-func (r *Repository) AddSeatsToEvent(ctx context.Context, seats []structs.SeatInput, eventId int64) error {
+func (r *Repository) AddSeatsToEvent(ctx context.Context, seats []structs.SeatInput, eventID int64) error {
 	return nil
 }
 
-func (r *Repository) GetSeatsByEventId(ctx context.Context, eventId int64) ([]structs.Seat, error) {
+func (r *Repository) GetSeatsByEventID(ctx context.Context, eventID int64) ([]structs.Seat, error) {
 	return nil, nil
 }

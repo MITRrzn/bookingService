@@ -1,7 +1,7 @@
 package structs
 
 type Seat struct {
-	eventId int64
-	number  string
-	price   float64
+	EventID int64
+	Number  string
+	Price   float64
 }
