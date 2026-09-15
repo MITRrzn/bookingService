@@ -47,9 +47,9 @@ func main() {
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 	go func() {
-		err := server.ListenAndServe()
-		if err != nil && !errors.Is(err, http.ErrServerClosed) {
-			log.Fatal(err)
+		listenErr := server.ListenAndServe()
+		if listenErr != nil && !errors.Is(listenErr, http.ErrServerClosed) {
+			log.Fatal(listenErr)
 		}
 	}()
 
