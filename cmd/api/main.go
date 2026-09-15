@@ -4,6 +4,7 @@ import (
 	"bookingService/internal/booking"
 	"bookingService/internal/database/psql"
 	"bookingService/internal/event"
+	bookingRepository "bookingService/internal/repository/booking"
 	eventRepository "bookingService/internal/repository/event"
 	seatsRepository "bookingService/internal/repository/seat"
 	"bookingService/internal/seats"
@@ -48,7 +49,7 @@ func main() {
 	mux.HandleFunc("POST /events/{eventID}/seats", seatsHandler.AddSeatsToEvent)
 	mux.HandleFunc("GET /events/{eventID}/seats", seatsHandler.GetSeatsByEventID)
 
-	bookingRepo := booking.NewBookingRepo(db)
+	bookingRepo := bookingRepository.NewBookingRepo(db)
 	bookingService := booking.NewService(bookingRepo)
 	bookingHandler := booking.NewHandler(bookingService)
 	mux.HandleFunc("POST /events/{eventID}/seats/{seatID}/reserve", bookingHandler.ReserveSeat)

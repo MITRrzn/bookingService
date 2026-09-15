@@ -1,15 +1,7 @@
 package booking
 
-import (
-	"database/sql"
-)
+import "context"
 
-type Repository struct {
-	db *sql.DB
-}
-
-func NewBookingRepo(db *sql.DB) *Repository {
-	return &Repository{
-		db: db,
-	}
+type BookingRepository interface {
+	ReserveSeat(ctx context.Context) error
 }

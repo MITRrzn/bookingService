@@ -3,6 +3,7 @@ package booking
 import (
 	"bookingService/internal/helper"
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"strconv"
@@ -35,5 +36,14 @@ func (h *Handler) ReserveSeat(w http.ResponseWriter, r *http.Request) {
 		log.Println("decode error:", err)
 		helper.WriteErrorResponse(w, "incorrect json format", http.StatusBadRequest)
 		return
+	}
+
+	bookErr := h.service.AddSeatsToEvent(r.Context(), eventId, seatId, req)
+	if bookErr != nil {
+		var validationErr ValidationError
+		if errors.As(bookErr, &validationErr) {
+			helper.WriteErrorResponse(w, validationErr.Error(), http.StatusBadRequest)
+			return
+		}
 	}
 }
