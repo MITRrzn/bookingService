@@ -1,6 +1,7 @@
 package booking
 
 import (
+	"bookingService/internal/booking"
 	"context"
 	"database/sql"
 )
@@ -15,7 +16,7 @@ func NewBookingRepo(db *sql.DB) *Repository {
 	}
 }
 
-func (r Repository) ReserveSeat(ctx context.Context) error {
+func (r Repository) ReserveSeat(ctx context.Context, input booking.Input) error {
 	//TODO implement me
 	panic("implement me")
 }

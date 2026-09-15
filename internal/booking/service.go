@@ -12,7 +12,7 @@ func NewService(repo BookingRepository) *BookingService {
 	}
 }
 
-func (s *BookingService) AddSeatsToEvent(ctx context.Context, eventID int64, seatId string, req ReserveSeatsRequest) error {
+func (s *BookingService) ReserveSeat(ctx context.Context, eventID int64, seatId int64, req ReserveSeatsRequest) error {
 	inputData := Input{
 		UserID:  req.UserID,
 		EventID: eventID,
@@ -34,7 +34,7 @@ func validateInput(input Input) error {
 	if input.EventID <= 0 {
 		return ValidationError{Message: "invalid event id"}
 	}
-	if input.SeatID == "" {
+	if input.SeatID <= 0 {
 		return ValidationError{Message: "invalid seat id"}
 	}
 

@@ -28,7 +28,13 @@ func (h *Handler) ReserveSeat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	seatId := r.PathValue("seatID")
+	seat := r.PathValue("seatID")
+	seatId, parseErr := strconv.ParseInt(seat, 10, 64)
+	if parseErr != nil {
+		log.Println("invalid event id:", parseErr)
+		helper.WriteErrorResponse(w, "invalid event id", http.StatusBadRequest)
+		return
+	}
 
 	var req ReserveSeatsRequest
 	decoder := json.NewDecoder(r.Body)
@@ -38,7 +44,7 @@ func (h *Handler) ReserveSeat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bookErr := h.service.AddSeatsToEvent(r.Context(), eventId, seatId, req)
+	bookErr := h.service.ReserveSeat(r.Context(), eventId, seatId, req)
 	if bookErr != nil {
 		var validationErr ValidationError
 		if errors.As(bookErr, &validationErr) {
