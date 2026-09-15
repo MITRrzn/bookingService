@@ -1,4 +1,4 @@
-.PHONY: docker-build docker-up seed migrate-up migrate-down
+.PHONY: docker-build docker-up migrate-up migrate-down
 
 docker-build:
 	docker compose up --build
