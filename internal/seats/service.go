@@ -14,6 +14,10 @@ func NewService(repo SeatRepository) *SeatService {
 	}
 }
 
+func (s *SeatService) AddSeatsToEvent(ctx context.Context, seats []SeatInput, eventID int64) (amount int64, err error) {
+	return s.repo.AddSeatsToEvent(ctx, seats, eventID)
+}
+
 func (s *SeatService) GetSeatsByEventID(ctx context.Context, id int64) ([]Seat, error) {
 	seats, err := s.repo.GetSeatsByEventID(ctx, id)
 	if err != nil {

@@ -4,6 +4,7 @@ import (
 	"bookingService/internal/seats"
 	"context"
 	"database/sql"
+	"fmt"
 )
 
 type Repository struct {
@@ -16,8 +17,45 @@ func NewSeatRepo(db *sql.DB) *Repository {
 	}
 }
 
-func (r *Repository) AddSeatsToEvent(ctx context.Context, seats []seats.SeatInput, eventID int64) error {
-	return nil
+func (r *Repository) AddSeatsToEvent(ctx context.Context, seats []seats.SeatInput, eventID int64) (amount int64, err error) {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return 0, fmt.Errorf("begin transaction: %w", err)
+	}
+
+	defer tx.Rollback()
+
+	stmt, err := tx.PrepareContext(
+		ctx,
+		`
+            INSERT INTO seats (event_id, number, price)
+            VALUES ($1, $2, $3)
+        `,
+	)
+	if err != nil {
+		return 0, fmt.Errorf("prepare insert seats: %w", err)
+	}
+	defer stmt.Close()
+
+	amount = 0
+	for _, item := range seats {
+		_, err = stmt.ExecContext(
+			ctx,
+			eventID,
+			item.Number,
+			item.Price,
+		)
+		if err != nil {
+			return 0, fmt.Errorf("insert seat %s: %w", item.Number, err)
+		}
+		amount++
+	}
+
+	if err = tx.Commit(); err != nil {
+		return 0, fmt.Errorf("commit transaction: %w", err)
+	}
+
+	return amount, nil
 }
 
 func (r *Repository) GetSeatsByEventID(ctx context.Context, eventID int64) ([]seats.Seat, error) {

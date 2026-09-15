@@ -5,6 +5,6 @@ import (
 )
 
 type SeatRepository interface {
-	AddSeatsToEvent(ctx context.Context, seats []SeatInput, eventID int64) error
+	AddSeatsToEvent(ctx context.Context, seats []SeatInput, eventID int64) (int64, error)
 	GetSeatsByEventID(ctx context.Context, eventID int64) ([]Seat, error)
 }
