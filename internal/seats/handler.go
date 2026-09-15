@@ -37,7 +37,7 @@ func (h *Handler) AddSeatsToEvent(w http.ResponseWriter, r *http.Request) {
 
 	amount, addErr := h.service.AddSeatsToEvent(r.Context(), request.Seats, id)
 	var validationErr ValidationError
-	if errors.As(err, &validationErr) {
+	if errors.As(addErr, &validationErr) {
 		helper.WriteErrorResponse(w, validationErr.Error(), http.StatusBadRequest)
 		return
 	}

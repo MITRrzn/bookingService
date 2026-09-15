@@ -23,9 +23,13 @@ func (s *SeatService) AddSeatsToEvent(ctx context.Context, seats []SeatInput, ev
 		}
 	}
 
-	seatsValidation := validateSeatsList(seats)
-	if seatsValidation == nil {
-		return 0, fmt.Errorf("invalid seats list: %v", seatsValidation)
+	for i := range seats {
+		seats[i].Number = strings.TrimSpace(seats[i].Number)
+	}
+
+	validationErr := validateSeatsList(seats)
+	if validationErr != nil {
+		return 0, fmt.Errorf("invalid seats list: %v", validationErr)
 	}
 
 	return s.repo.AddSeats(ctx, seats, eventID)
@@ -59,20 +63,22 @@ func validateSeatsList(seats []SeatInput) error {
 				Message: "invalid price",
 			}
 		}
+		if seat.Number == "" {
+			return ValidationError{
+				Message: "seat number is empty",
+			}
+		}
 	}
 
-	seen := make(map[string]struct{})
-
+	seen := make(map[string]struct{}, len(seats))
 	for _, seat := range seats {
-		number := strings.TrimSpace(seat.Number)
-
-		if _, exists := seen[number]; exists {
+		if _, exists := seen[seat.Number]; exists {
 			return ValidationError{
-				Message: fmt.Sprintf("duplicate seat number: %v", number),
+				Message: fmt.Sprintf("duplicate seat number: %v", seat.Number),
 			}
 		}
 
-		seen[number] = struct{}{}
+		seen[seat.Number] = struct{}{}
 	}
 
 	return nil
