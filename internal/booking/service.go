@@ -1,9 +1,13 @@
 package booking
 
-import "context"
+import (
+	"bookingService/internal/seats"
+	"context"
+)
 
 type BookingService struct {
-	repo BookingRepository
+	repo     BookingRepository
+	seatRepo seats.SeatRepository
 }
 
 func NewService(repo BookingRepository) *BookingService {
@@ -22,6 +26,11 @@ func (s *BookingService) ReserveSeat(ctx context.Context, eventID int64, seatId 
 	validationErr := validateInput(inputData)
 	if validationErr != nil {
 		return validationErr
+	}
+
+	_, err := s.seatRepo.GetSeatByID(ctx, inputData.SeatID)
+	if err != nil {
+		return err
 	}
 
 	return nil

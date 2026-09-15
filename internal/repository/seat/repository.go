@@ -4,11 +4,42 @@ import (
 	"bookingService/internal/seats"
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 )
 
 type Repository struct {
 	db *sql.DB
+}
+
+func (r *Repository) GetSeatByID(ctx context.Context, seatID int64) (seats.Seat, error) {
+	var model seats.Seat
+
+	err := r.db.QueryRowContext(
+		ctx,
+		`
+            SELECT id, event_id, number, price, created_at
+            FROM seats
+            WHERE id = $1
+        `,
+		seatID,
+	).Scan(
+		&model.ID,
+		&model.EventID,
+		&model.Number,
+		&model.Price,
+		&model.CreatedAt,
+	)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return seats.Seat{}, sql.ErrNoRows
+	}
+
+	if err != nil {
+		return seats.Seat{}, fmt.Errorf("get seat by id: %w", err)
+	}
+
+	return model, nil
 }
 
 func NewSeatRepo(db *sql.DB) *Repository {

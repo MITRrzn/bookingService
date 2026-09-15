@@ -2,6 +2,7 @@ package booking
 
 import (
 	"bookingService/internal/helper"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"log"
@@ -32,7 +33,7 @@ func (h *Handler) ReserveSeat(w http.ResponseWriter, r *http.Request) {
 	seatId, parseErr := strconv.ParseInt(seat, 10, 64)
 	if parseErr != nil {
 		log.Println("invalid event id:", parseErr)
-		helper.WriteErrorResponse(w, "invalid event id", http.StatusBadRequest)
+		helper.WriteErrorResponse(w, "invalid seat id", http.StatusBadRequest)
 		return
 	}
 
@@ -45,6 +46,10 @@ func (h *Handler) ReserveSeat(w http.ResponseWriter, r *http.Request) {
 	}
 
 	bookErr := h.service.ReserveSeat(r.Context(), eventId, seatId, req)
+	if errors.Is(bookErr, sql.ErrNoRows) {
+		helper.WriteErrorResponse(w, "data not found", http.StatusNotFound)
+		return
+	}
 	if bookErr != nil {
 		var validationErr ValidationError
 		if errors.As(bookErr, &validationErr) {
