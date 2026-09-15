@@ -17,7 +17,7 @@ func NewSeatRepo(db *sql.DB) *Repository {
 	}
 }
 
-func (r *Repository) AddSeatsToEvent(ctx context.Context, seats []seats.SeatInput, eventID int64) (amount int64, err error) {
+func (r *Repository) AddSeats(ctx context.Context, seats []seats.SeatInput, eventID int64) (int64, error) {
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
 		return 0, fmt.Errorf("begin transaction: %w", err)
@@ -37,7 +37,7 @@ func (r *Repository) AddSeatsToEvent(ctx context.Context, seats []seats.SeatInpu
 	}
 	defer stmt.Close()
 
-	amount = 0
+	amount := 0
 	for _, item := range seats {
 		_, err = stmt.ExecContext(
 			ctx,
@@ -55,7 +55,7 @@ func (r *Repository) AddSeatsToEvent(ctx context.Context, seats []seats.SeatInpu
 		return 0, fmt.Errorf("commit transaction: %w", err)
 	}
 
-	return amount, nil
+	return int64(amount), nil
 }
 
 func (r *Repository) GetSeatsByEventID(ctx context.Context, eventID int64) ([]seats.Seat, error) {

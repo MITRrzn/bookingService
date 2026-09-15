@@ -3,6 +3,7 @@ package seats
 import (
 	"bookingService/internal/helper"
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"strconv"
@@ -35,13 +36,19 @@ func (h *Handler) AddSeatsToEvent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	amount, addErr := h.service.AddSeatsToEvent(r.Context(), request.Seats, id)
+	var validationErr ValidationError
+	if errors.As(err, &validationErr) {
+		helper.WriteErrorResponse(w, validationErr.Error(), http.StatusBadRequest)
+		return
+	}
+
 	if addErr != nil {
 		helper.WriteErrorResponse(w, "failed to add seats", http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 	encodeErr := json.NewEncoder(w).Encode(PostSeatsResponse{
 		Success: "OK",
 		Amount:  amount,
@@ -61,6 +68,11 @@ func (h *Handler) GetSeatsByEventID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result, err := h.service.GetSeatsByEventID(r.Context(), id)
+	var validationErr ValidationError
+	if errors.As(err, &validationErr) {
+		helper.WriteErrorResponse(w, validationErr.Error(), http.StatusBadRequest)
+		return
+	}
 	if err != nil {
 		helper.WriteErrorResponse(w, "internal server error", http.StatusInternalServerError)
 		return

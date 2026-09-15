@@ -5,6 +5,6 @@ type AddSeatsRequest struct {
 }
 
 type SeatInput struct {
-	Number string
-	Price  float64
+	Number string  `json:"number"`
+	Price  float64 `json:"price"`
 }
