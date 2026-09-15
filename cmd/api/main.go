@@ -4,6 +4,8 @@ import (
 	"bookingService/internal/database/psql"
 	"bookingService/internal/event"
 	eventRepository "bookingService/internal/repository/event"
+	seatsRepository "bookingService/internal/repository/seat"
+	"bookingService/internal/seats"
 	"context"
 	"errors"
 	"fmt"
@@ -29,15 +31,21 @@ func main() {
 		}
 	}()
 
+	mux := http.NewServeMux()
+
 	eventRepo := eventRepository.NewEventRepo(db)
 	eventService := event.NewService(eventRepo)
 	eventHandler := event.NewHandler(eventService)
-
-	mux := http.NewServeMux()
-
 	mux.HandleFunc("POST /events", eventHandler.CreateEvent)
 	mux.HandleFunc("GET /events", eventHandler.GetEvents)
 	mux.HandleFunc("GET /events/{id}", eventHandler.GetEventByID)
+
+	seatsRepo := seatsRepository.NewSeatsRepo(db)
+	seatsService := seats.NewService(seatsRepo)
+	seatsHandler := seats.NewHandler(seatsService)
+
+	mux.HandleFunc("POST /events/{eventID}/seats", seatsHandler.AddSeatsToEvent)
+	mux.HandleFunc("GET /events/{eventID}/seats", seatsHandler.GetSeatsByEventId)
 
 	port := os.Getenv("APP_PORT")
 	log.Println("Starting server at port", port)

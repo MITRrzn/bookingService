@@ -7,17 +7,17 @@ import (
 	"unicode/utf8"
 )
 
-type Service struct {
-	repo Repository
+type EventService struct {
+	repo EventRepository
 }
 
-func NewService(repo Repository) *Service {
-	return &Service{
+func NewService(repo EventRepository) *EventService {
+	return &EventService{
 		repo: repo,
 	}
 }
 
-func (s *Service) CreateEvent(ctx context.Context, input structs.CreateEventInput) (structs.Event, error) {
+func (s *EventService) CreateEvent(ctx context.Context, input structs.CreateEventInput) (structs.Event, error) {
 	validationErr := validateCreateEventInput(input)
 	if validationErr != nil {
 		return structs.Event{}, validationErr
@@ -51,7 +51,7 @@ func validateCreateEventInput(input structs.CreateEventInput) error {
 	return nil
 }
 
-func (s *Service) GetEvents(ctx context.Context) ([]structs.Event, error) {
+func (s *EventService) GetEvents(ctx context.Context) ([]structs.Event, error) {
 	events, err := s.repo.GetActiveEvents(ctx)
 	if err != nil {
 		return nil, err
@@ -60,6 +60,6 @@ func (s *Service) GetEvents(ctx context.Context) ([]structs.Event, error) {
 	return events, nil
 }
 
-func (s *Service) GetEventByID(ctx context.Context, id int64) (structs.Event, error) {
+func (s *EventService) GetEventByID(ctx context.Context, id int64) (structs.Event, error) {
 	return s.repo.GetEventByID(ctx, id)
 }

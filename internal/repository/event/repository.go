@@ -12,6 +12,12 @@ type Repository struct {
 	db *sql.DB
 }
 
+func NewEventRepo(db *sql.DB) *Repository {
+	return &Repository{
+		db: db,
+	}
+}
+
 func (r *Repository) GetActiveEvents(ctx context.Context) ([]structs.Event, error) {
 	rows, err := r.db.QueryContext(ctx,
 		`
@@ -43,12 +49,6 @@ func (r *Repository) GetActiveEvents(ctx context.Context) ([]structs.Event, erro
 	}
 
 	return events, nil
-}
-
-func NewEventRepo(db *sql.DB) *Repository {
-	return &Repository{
-		db: db,
-	}
 }
 
 func (r *Repository) CreateEvent(ctx context.Context, input structs.CreateEventInput) (structs.Event, error) {
