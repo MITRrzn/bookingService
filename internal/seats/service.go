@@ -29,7 +29,7 @@ func (s *SeatService) AddSeatsToEvent(ctx context.Context, seats []SeatInput, ev
 
 	validationErr := validateSeatsList(seats)
 	if validationErr != nil {
-		return 0, fmt.Errorf("invalid seats list: %v", validationErr)
+		return 0, fmt.Errorf("invalid seats list: %w", validationErr)
 	}
 
 	return s.repo.AddSeats(ctx, seats, eventID)

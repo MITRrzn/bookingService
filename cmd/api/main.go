@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bookingService/internal/booking"
 	"bookingService/internal/database/psql"
 	"bookingService/internal/event"
 	eventRepository "bookingService/internal/repository/event"
@@ -46,6 +47,11 @@ func main() {
 
 	mux.HandleFunc("POST /events/{eventID}/seats", seatsHandler.AddSeatsToEvent)
 	mux.HandleFunc("GET /events/{eventID}/seats", seatsHandler.GetSeatsByEventID)
+
+	bookingRepo := booking.NewBookingRepo(db)
+	bookingService := booking.NewService(bookingRepo)
+	bookingHandler := booking.NewHandler(bookingService)
+	mux.HandleFunc("POST /events/{eventID}/seats/{seatID}/reserve", bookingHandler.ReserveSeat)
 
 	port := os.Getenv("APP_PORT")
 	log.Println("Starting server at port", port)
