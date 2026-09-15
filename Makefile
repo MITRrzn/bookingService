@@ -1,7 +1,7 @@
 .PHONY: docker-build docker-up migrate-up migrate-down
 
 docker-build:
-	docker compose up --build
+	docker compose up --build -d
 
 docker-up:
 	docker compose up -d --force-recreate
