@@ -1,4 +1,4 @@
-package structs
+package event
 
 type CreateEventInput struct {
 	Name     string `json:"name"`

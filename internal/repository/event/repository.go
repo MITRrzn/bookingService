@@ -1,7 +1,7 @@
 package event
 
 import (
-	"bookingService/internal/structs"
+	"bookingService/internal/event"
 	"context"
 	"database/sql"
 	"errors"
@@ -18,7 +18,7 @@ func NewEventRepo(db *sql.DB) *Repository {
 	}
 }
 
-func (r *Repository) GetActiveEvents(ctx context.Context) ([]structs.Event, error) {
+func (r *Repository) GetActiveEvents(ctx context.Context) ([]event.Event, error) {
 	rows, err := r.db.QueryContext(ctx,
 		`
 		SELECT id, name, starts_at FROM events
@@ -33,15 +33,15 @@ func (r *Repository) GetActiveEvents(ctx context.Context) ([]structs.Event, erro
 
 	defer rows.Close()
 
-	var events []structs.Event
+	var events []event.Event
 	for rows.Next() {
-		var event structs.Event
-		scanErr := rows.Scan(&event.ID, &event.Name, &event.StartsAt)
+		var model event.Event
+		scanErr := rows.Scan(&model.ID, &model.Name, &model.StartsAt)
 		if scanErr != nil {
 			return nil, scanErr
 		}
 
-		events = append(events, event)
+		events = append(events, model)
 	}
 
 	if rowsErr := rows.Err(); rowsErr != nil {
@@ -51,8 +51,8 @@ func (r *Repository) GetActiveEvents(ctx context.Context) ([]structs.Event, erro
 	return events, nil
 }
 
-func (r *Repository) CreateEvent(ctx context.Context, input structs.CreateEventInput) (structs.Event, error) {
-	var event structs.Event
+func (r *Repository) CreateEvent(ctx context.Context, input event.CreateEventInput) (event.Event, error) {
+	var model event.Event
 
 	err := r.db.QueryRowContext(
 		ctx,
@@ -64,21 +64,21 @@ func (r *Repository) CreateEvent(ctx context.Context, input structs.CreateEventI
 		input.Name,
 		input.StartsAt,
 	).Scan(
-		&event.ID,
-		&event.Name,
-		&event.StartsAt,
-		&event.CreatedAt,
+		&model.ID,
+		&model.Name,
+		&model.StartsAt,
+		&model.CreatedAt,
 	)
 
 	if err != nil {
-		return structs.Event{}, fmt.Errorf("create event: %w", err)
+		return event.Event{}, fmt.Errorf("create event: %w", err)
 	}
 
-	return event, nil
+	return model, nil
 }
 
-func (r *Repository) GetEventByID(ctx context.Context, id int64) (structs.Event, error) {
-	var event structs.Event
+func (r *Repository) GetEventByID(ctx context.Context, id int64) (event.Event, error) {
+	var model event.Event
 
 	err := r.db.QueryRowContext(
 		ctx,
@@ -87,18 +87,18 @@ func (r *Repository) GetEventByID(ctx context.Context, id int64) (structs.Event,
 				WHERE id = $1`,
 		id,
 	).Scan(
-		&event.ID,
-		&event.Name,
-		&event.StartsAt,
-		&event.CreatedAt,
+		&model.ID,
+		&model.Name,
+		&model.StartsAt,
+		&model.CreatedAt,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
-		return structs.Event{}, sql.ErrNoRows
+		return event.Event{}, sql.ErrNoRows
 	}
 
 	if err != nil {
-		return structs.Event{}, fmt.Errorf("failed get event by id: %w", err)
+		return event.Event{}, fmt.Errorf("failed get event by id: %w", err)
 	}
 
-	return event, nil
+	return model, nil
 }

@@ -17,17 +17,17 @@ func NewService(repo EventRepository) *EventService {
 	}
 }
 
-func (s *EventService) CreateEvent(ctx context.Context, input structs.CreateEventInput) (structs.Event, error) {
+func (s *EventService) CreateEvent(ctx context.Context, input CreateEventInput) (Event, error) {
 	validationErr := validateCreateEventInput(input)
 	if validationErr != nil {
-		return structs.Event{}, validationErr
+		return Event{}, validationErr
 	}
 	input.Name = strings.TrimSpace(input.Name)
 
 	return s.repo.CreateEvent(ctx, input)
 }
 
-func validateCreateEventInput(input structs.CreateEventInput) error {
+func validateCreateEventInput(input CreateEventInput) error {
 	name := strings.TrimSpace(input.Name)
 
 	if name == "" {
@@ -51,7 +51,7 @@ func validateCreateEventInput(input structs.CreateEventInput) error {
 	return nil
 }
 
-func (s *EventService) GetEvents(ctx context.Context) ([]structs.Event, error) {
+func (s *EventService) GetEvents(ctx context.Context) ([]Event, error) {
 	events, err := s.repo.GetActiveEvents(ctx)
 	if err != nil {
 		return nil, err
@@ -60,6 +60,6 @@ func (s *EventService) GetEvents(ctx context.Context) ([]structs.Event, error) {
 	return events, nil
 }
 
-func (s *EventService) GetEventByID(ctx context.Context, id int64) (structs.Event, error) {
+func (s *EventService) GetEventByID(ctx context.Context, id int64) (Event, error) {
 	return s.repo.GetEventByID(ctx, id)
 }

@@ -22,7 +22,7 @@ func NewHandler(service *EventService) *Handler {
 }
 
 func (h *Handler) CreateEvent(w http.ResponseWriter, r *http.Request) {
-	var event structs.CreateEventInput
+	var event CreateEventInput
 
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&event); err != nil {
@@ -47,7 +47,7 @@ func (h *Handler) CreateEvent(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	encodeErr := json.NewEncoder(w).Encode(structs.SuccessResponse{
+	encodeErr := json.NewEncoder(w).Encode(SuccessResponse{
 		Success: "created",
 		Event:   createdEvent,
 	})
@@ -78,7 +78,7 @@ func (h *Handler) GetEventByID(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	encodeErr := json.NewEncoder(w).Encode(structs.SuccessResponse{
+	encodeErr := json.NewEncoder(w).Encode(SuccessResponse{
 		Success: "OK",
 		Event:   event,
 	})
@@ -98,7 +98,7 @@ func (h *Handler) GetEvents(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	encodeErr := json.NewEncoder(w).Encode(structs.EventsResponse{
+	encodeErr := json.NewEncoder(w).Encode(EventsResponse{
 		Success: "OK",
 		Events:  events,
 	})

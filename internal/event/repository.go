@@ -1,12 +1,11 @@
 package event
 
 import (
-	"bookingService/internal/structs"
 	"context"
 )
 
 type EventRepository interface {
-	CreateEvent(ctx context.Context, event structs.CreateEventInput) (structs.Event, error)
-	GetActiveEvents(ctx context.Context) ([]structs.Event, error)
-	GetEventByID(ctx context.Context, id int64) (structs.Event, error)
+	CreateEvent(ctx context.Context, event CreateEventInput) (Event, error)
+	GetActiveEvents(ctx context.Context) ([]Event, error)
+	GetEventByID(ctx context.Context, id int64) (Event, error)
 }
