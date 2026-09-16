@@ -1,4 +1,4 @@
-package ReservationStore
+package booking
 
 import (
 	"context"
@@ -8,9 +8,7 @@ import (
 type ReservationStore interface {
 	Reserve(
 		ctx context.Context,
-		eventID int64,
-		seatID int64,
-		userID int64,
+		input Input,
 		ttl time.Duration,
 	) (bool, error)
 }

@@ -1,18 +1,18 @@
 package booking
 
 import (
-	"bookingService/internal/booking/ReservationStore"
 	"bookingService/internal/seats"
 	"context"
+	"time"
 )
 
 type BookingService struct {
 	repo             BookingRepository
 	seatRepo         seats.SeatRepository
-	reservationStore ReservationStore.ReservationStore
+	reservationStore ReservationStore
 }
 
-func NewService(repo BookingRepository, seatRepo seats.SeatRepository, reservationStore ReservationStore.ReservationStore) *BookingService {
+func NewService(repo BookingRepository, seatRepo seats.SeatRepository, reservationStore ReservationStore) *BookingService {
 	return &BookingService{
 		repo:             repo,
 		seatRepo:         seatRepo,
@@ -41,6 +41,16 @@ func (s *BookingService) ReserveSeat(ctx context.Context, eventID int64, seatId 
 			Message: "seat not found",
 		}
 	}
+
+	reserved, reserveErr := s.reservationStore.Reserve(ctx, inputData, time.Minute*5)
+	if reserveErr != nil {
+		return InternalError{Message: "reservation service error"}
+	}
+	if !reserved {
+		return ConflictError{Message: "seat is already reserved"}
+	}
+
+	//Todo store to bookings table
 
 	return nil
 }

@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"bookingService/internal/booking"
 	"context"
 	"fmt"
 	"time"
@@ -18,10 +19,10 @@ func NewReservationStore(client *redis.Client) *ReservationStore {
 	}
 }
 
-func (r *ReservationStore) Reserve(ctx context.Context, eventID int64, seatID int64, userID int64, ttl time.Duration) (bool, error) {
-	key := fmt.Sprintf("reservation:%d:%d", eventID, seatID)
+func (r *ReservationStore) Reserve(ctx context.Context, input booking.Input, ttl time.Duration) (bool, error) {
+	key := fmt.Sprintf("reservation:%d:%d", input.EventID, input.SeatID)
 
-	reserved, err := r.client.SetNX(ctx, key, userID, ttl).Result()
+	reserved, err := r.client.SetNX(ctx, key, input.UserID, ttl).Result()
 
 	if err != nil {
 		return false, err
