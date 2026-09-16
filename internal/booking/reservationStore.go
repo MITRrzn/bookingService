@@ -6,9 +6,7 @@ import (
 )
 
 type ReservationStore interface {
-	Reserve(
-		ctx context.Context,
-		input Input,
-		ttl time.Duration,
-	) (bool, error)
+	Reserve(ctx context.Context, input Input, ttl time.Duration) (bool, error)
+
+	DeleteReserve(ctx context.Context, input Input) error
 }

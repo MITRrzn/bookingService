@@ -19,6 +19,7 @@ func NewBookingRepo(db *sql.DB) *Repository {
 
 func (r Repository) CreateBooking(ctx context.Context, input booking.Input) (booking.Result, error) {
 	var result booking.Result
+	now := time.Now()
 
 	err := r.db.QueryRowContext(
 		ctx,
@@ -37,18 +38,15 @@ func (r Repository) CreateBooking(ctx context.Context, input booking.Input) (boo
             seat_id,
             status,
             reserved_at,
-            expires_at,
-            confirmed_at,
-            created_at,
-            updated_at
+            expires_at
     	`,
 		input.UserID,
 		input.SeatID,
 		"reserved",
-		time.Now(),
-		time.Now().Add(time.Minute*5),
+		now,
+		now.Add(time.Minute*5),
 	).Scan(
-		&result.BookingId,
+		&result.BookingID,
 		&result.UserID,
 		&result.SeatID,
 		&result.Status,
