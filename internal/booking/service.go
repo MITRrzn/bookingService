@@ -1,19 +1,22 @@
 package booking
 
 import (
+	"bookingService/internal/booking/ReservationStore"
 	"bookingService/internal/seats"
 	"context"
 )
 
 type BookingService struct {
-	repo     BookingRepository
-	seatRepo seats.SeatRepository
+	repo             BookingRepository
+	seatRepo         seats.SeatRepository
+	reservationStore ReservationStore.ReservationStore
 }
 
-func NewService(repo BookingRepository, seatRepo seats.SeatRepository) *BookingService {
+func NewService(repo BookingRepository, seatRepo seats.SeatRepository, reservationStore ReservationStore.ReservationStore) *BookingService {
 	return &BookingService{
-		repo:     repo,
-		seatRepo: seatRepo,
+		repo:             repo,
+		seatRepo:         seatRepo,
+		reservationStore: reservationStore,
 	}
 }
 

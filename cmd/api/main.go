@@ -3,9 +3,11 @@ package main
 import (
 	"bookingService/internal/booking"
 	"bookingService/internal/database/psql"
+	redisdb "bookingService/internal/database/redis"
 	"bookingService/internal/event"
 	bookingRepository "bookingService/internal/repository/booking"
 	eventRepository "bookingService/internal/repository/event"
+	"bookingService/internal/repository/redis"
 	seatsRepository "bookingService/internal/repository/seat"
 	"bookingService/internal/seats"
 	"context"
@@ -49,8 +51,13 @@ func main() {
 	mux.HandleFunc("POST /events/{eventID}/seats", seatsHandler.AddSeatsToEvent)
 	mux.HandleFunc("GET /events/{eventID}/seats", seatsHandler.GetSeatsByEventID)
 
+	redisClient, err := redisdb.GetRedisClient(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
 	bookingRepo := bookingRepository.NewBookingRepo(db)
-	bookingService := booking.NewService(bookingRepo, seatsRepo)
+	reservationStore := redis.NewReservationStore(redisClient)
+	bookingService := booking.NewService(bookingRepo, seatsRepo, reservationStore)
 	bookingHandler := booking.NewHandler(bookingService)
 	mux.HandleFunc("POST /events/{eventID}/seats/{seatID}/reserve", bookingHandler.ReserveSeat)
 
