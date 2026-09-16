@@ -17,7 +17,7 @@ func NewBookingRepo(db *sql.DB) *Repository {
 	}
 }
 
-func (r Repository) CreateBooking(ctx context.Context, input booking.Input, reservedAt time.Time, ttl time.Duration) (booking.Result, error) {
+func (r Repository) CreateBooking(ctx context.Context, input booking.Input, reservedAt time.Time, ttl time.Time) (booking.Result, error) {
 	var result booking.Result
 
 	err := r.db.QueryRowContext(
@@ -43,7 +43,7 @@ func (r Repository) CreateBooking(ctx context.Context, input booking.Input, rese
 		input.SeatID,
 		"reserved",
 		reservedAt,
-		reservedAt.Add(ttl),
+		ttl,
 	).Scan(
 		&result.BookingID,
 		&result.UserID,

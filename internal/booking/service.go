@@ -43,6 +43,7 @@ func (s *BookingService) ReserveSeat(ctx context.Context, eventID int64, seatId 
 		}
 	}
 
+	now := time.Now()
 	ttl := time.Minute * 5
 	reserved, reserveErr := s.reservationStore.Reserve(ctx, inputData, ttl)
 	if reserveErr != nil {
@@ -53,7 +54,7 @@ func (s *BookingService) ReserveSeat(ctx context.Context, eventID int64, seatId 
 		return Result{}, ConflictError{Message: "seat is already reserved"}
 	}
 
-	result, createErr := s.repo.CreateBooking(ctx, inputData, time.Now(), ttl)
+	result, createErr := s.repo.CreateBooking(ctx, inputData, now, now.Add(ttl))
 	if createErr != nil {
 		log.Println(createErr)
 		delReserveErr := s.reservationStore.DeleteReserve(ctx, inputData)
