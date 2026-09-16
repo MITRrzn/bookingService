@@ -45,7 +45,7 @@ func (h *Handler) ReserveSeat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bookErr := h.service.ReserveSeat(r.Context(), eventId, seatId, req)
+	result, bookErr := h.service.ReserveSeat(r.Context(), eventId, seatId, req)
 	if errors.Is(bookErr, sql.ErrNoRows) {
 		helper.WriteErrorResponse(w, "data not found", http.StatusNotFound)
 		return
@@ -74,5 +74,17 @@ func (h *Handler) ReserveSeat(w http.ResponseWriter, r *http.Request) {
 			helper.WriteErrorResponse(w, validationErr.Error(), http.StatusBadRequest)
 			return
 		}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+
+	encodeErr := json.NewEncoder(w).Encode(Response{
+		Success:     "OK",
+		BookingData: result,
+	})
+
+	if encodeErr != nil {
+		log.Println("encode response error:", encodeErr)
 	}
 }

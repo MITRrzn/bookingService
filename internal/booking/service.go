@@ -3,6 +3,7 @@ package booking
 import (
 	"bookingService/internal/seats"
 	"context"
+	"log"
 	"time"
 )
 
@@ -20,7 +21,7 @@ func NewService(repo BookingRepository, seatRepo seats.SeatRepository, reservati
 	}
 }
 
-func (s *BookingService) ReserveSeat(ctx context.Context, eventID int64, seatId int64, req ReserveSeatsRequest) error {
+func (s *BookingService) ReserveSeat(ctx context.Context, eventID int64, seatId int64, req ReserveSeatsRequest) (Result, error) {
 	inputData := Input{
 		UserID:  req.UserID,
 		EventID: eventID,
@@ -29,40 +30,48 @@ func (s *BookingService) ReserveSeat(ctx context.Context, eventID int64, seatId 
 
 	validationErr := validateInput(inputData)
 	if validationErr != nil {
-		return validationErr
+		return Result{}, validationErr
 	}
 
 	seat, err := s.seatRepo.GetSeatByID(ctx, inputData.SeatID)
 	if err != nil {
-		return err
+		return Result{}, err
 	}
 	if seat.EventID != inputData.EventID {
-		return NotFoundError{
+		return Result{}, NotFoundError{
 			Message: "seat not found",
 		}
 	}
 
 	reserved, reserveErr := s.reservationStore.Reserve(ctx, inputData, time.Minute*5)
 	if reserveErr != nil {
-		return InternalError{Message: "reservation service error"}
+		log.Println(reserveErr)
+		return Result{}, InternalError{Message: "reservation service error"}
 	}
 	if !reserved {
-		return ConflictError{Message: "seat is already reserved"}
+		return Result{}, ConflictError{Message: "seat is already reserved"}
 	}
 
-	//Todo store to bookings table
+	result, createErr := s.repo.CreateBooking(ctx, inputData)
+	if createErr != nil {
+		log.Println(createErr)
+		return Result{}, InternalError{Message: "create booking service error"}
+	}
 
-	return nil
+	return result, nil
 }
 
 func validateInput(input Input) error {
 	if input.UserID <= 0 {
+		log.Println("invalid user id", input)
 		return ValidationError{Message: "invalid user id"}
 	}
 	if input.EventID <= 0 {
+		log.Println("invalid event id", input)
 		return ValidationError{Message: "invalid event id"}
 	}
 	if input.SeatID <= 0 {
+		log.Println("invalid seat id", input)
 		return ValidationError{Message: "invalid seat id"}
 	}
 
