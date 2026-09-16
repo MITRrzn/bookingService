@@ -10,9 +10,10 @@ type BookingService struct {
 	seatRepo seats.SeatRepository
 }
 
-func NewService(repo BookingRepository) *BookingService {
+func NewService(repo BookingRepository, seatRepo seats.SeatRepository) *BookingService {
 	return &BookingService{
-		repo: repo,
+		repo:     repo,
+		seatRepo: seatRepo,
 	}
 }
 
@@ -28,9 +29,14 @@ func (s *BookingService) ReserveSeat(ctx context.Context, eventID int64, seatId 
 		return validationErr
 	}
 
-	_, err := s.seatRepo.GetSeatByID(ctx, inputData.SeatID)
+	seat, err := s.seatRepo.GetSeatByID(ctx, inputData.SeatID)
 	if err != nil {
 		return err
+	}
+	if seat.EventID != inputData.EventID {
+		return NotFoundError{
+			Message: "event not found",
+		}
 	}
 
 	return nil

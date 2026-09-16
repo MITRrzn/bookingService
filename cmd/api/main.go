@@ -50,7 +50,7 @@ func main() {
 	mux.HandleFunc("GET /events/{eventID}/seats", seatsHandler.GetSeatsByEventID)
 
 	bookingRepo := bookingRepository.NewBookingRepo(db)
-	bookingService := booking.NewService(bookingRepo)
+	bookingService := booking.NewService(bookingRepo, seatsRepo)
 	bookingHandler := booking.NewHandler(bookingService)
 	mux.HandleFunc("POST /events/{eventID}/seats/{seatID}/reserve", bookingHandler.ReserveSeat)
 
