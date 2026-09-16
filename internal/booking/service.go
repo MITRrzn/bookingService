@@ -35,7 +35,7 @@ func (s *BookingService) ReserveSeat(ctx context.Context, eventID int64, seatId 
 	}
 	if seat.EventID != inputData.EventID {
 		return NotFoundError{
-			Message: "event not found",
+			Message: "seat not found",
 		}
 	}
 

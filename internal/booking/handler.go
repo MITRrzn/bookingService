@@ -56,6 +56,7 @@ func (h *Handler) ReserveSeat(w http.ResponseWriter, r *http.Request) {
 
 		if errors.As(bookErr, &notFoundErr) {
 			helper.WriteErrorResponse(w, notFoundErr.Error(), http.StatusNotFound)
+			return
 		}
 		if errors.As(bookErr, &validationErr) {
 			helper.WriteErrorResponse(w, validationErr.Error(), http.StatusBadRequest)
