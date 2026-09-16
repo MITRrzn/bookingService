@@ -28,13 +28,6 @@ func (s *BookingService) ReserveSeat(ctx context.Context, eventID int64, seatId 
 		SeatID:  seatId,
 	}
 
-	delReserve := func() {
-		delReserveErr := s.reservationStore.DeleteReserve(ctx, inputData)
-		if delReserveErr != nil {
-			log.Println(delReserveErr)
-		}
-	}
-
 	validationErr := validateInput(inputData)
 	if validationErr != nil {
 		return Result{}, validationErr
@@ -50,7 +43,8 @@ func (s *BookingService) ReserveSeat(ctx context.Context, eventID int64, seatId 
 		}
 	}
 
-	reserved, reserveErr := s.reservationStore.Reserve(ctx, inputData, time.Minute*5)
+	ttl := time.Minute * 5
+	reserved, reserveErr := s.reservationStore.Reserve(ctx, inputData, ttl)
 	if reserveErr != nil {
 		log.Println(reserveErr)
 		return Result{}, InternalError{Message: "reservation service error"}
@@ -59,13 +53,15 @@ func (s *BookingService) ReserveSeat(ctx context.Context, eventID int64, seatId 
 		return Result{}, ConflictError{Message: "seat is already reserved"}
 	}
 
-	result, createErr := s.repo.CreateBooking(ctx, inputData)
+	result, createErr := s.repo.CreateBooking(ctx, inputData, time.Now(), ttl)
 	if createErr != nil {
 		log.Println(createErr)
-		delReserve()
+		delReserveErr := s.reservationStore.DeleteReserve(ctx, inputData)
+		if delReserveErr != nil {
+			log.Println(delReserveErr)
+		}
 		return Result{}, InternalError{Message: "create booking service error"}
 	}
-	delReserve()
 
 	return result, nil
 }

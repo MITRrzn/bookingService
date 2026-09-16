@@ -1,7 +1,10 @@
 package booking
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 type BookingRepository interface {
-	CreateBooking(ctx context.Context, input Input) (Result, error)
+	CreateBooking(ctx context.Context, input Input, reservedAt time.Time, ttl time.Duration) (Result, error)
 }
