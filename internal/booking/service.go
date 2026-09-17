@@ -130,6 +130,20 @@ func (s *BookingService) CancelBooking(ctx context.Context, bookingID int64, req
 	return nil
 }
 
+func (s *BookingService) ListBookings(ctx context.Context, userID int64) ([]ListItem, error) {
+	if userID <= 0 {
+		return nil, ValidationError{Message: "invalid user id"}
+	}
+
+	list, err := s.repo.GetBookingsByUser(ctx, userID)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return list, nil
+}
+
 func validateInput(input ReserveInput) error {
 	if input.UserID <= 0 {
 		log.Println("invalid user id", input)

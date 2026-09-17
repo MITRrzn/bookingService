@@ -128,3 +128,55 @@ func (r Repository) CancelBooking(ctx context.Context, input booking.CancelInput
 
 	return result, nil
 }
+
+func (r Repository) GetBookingsByUser(ctx context.Context, userID int64) ([]booking.ListItem, error) {
+	rows, err := r.db.QueryContext(ctx,
+		`
+			SELECT
+			b.id,
+			b.status,
+			b.reserved_at,
+			b.expires_at,
+			b.confirmed_at,
+			s.number,
+			s.price,
+			e.name,
+			e.starts_at
+			FROM bookings b JOIN seats s ON b.seat_id = s.id JOIN events e ON s.event_id = e.id
+				WHERE b.user_id = $1
+			ORDER BY b.reserved_at DESC `,
+		userID,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var items []booking.ListItem
+	for rows.Next() {
+		var item booking.ListItem
+		scanErr := rows.Scan(
+			&item.BookingID,
+			&item.BookingStatus,
+			&item.ReservedAt,
+			&item.ExpiresAt,
+			&item.ConfirmedAt,
+			&item.SeatNumber,
+			&item.SeatPrice,
+			&item.EventName,
+			&item.EventStartsAt,
+		)
+		if scanErr != nil {
+			return nil, scanErr
+		}
+
+		items = append(items, item)
+	}
+
+	if rowsErr := rows.Err(); rowsErr != nil {
+		return nil, rowsErr
+	}
+
+	return items, nil
+}

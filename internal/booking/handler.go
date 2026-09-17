@@ -176,6 +176,40 @@ func (h *Handler) Cancel(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
+	var req ListBookingRequest
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&req); err != nil {
+		log.Println("decode error:", err)
+		helper.WriteErrorResponse(w, "incorrect json format", http.StatusBadRequest)
+		return
+	}
+
+	list, listErr := h.service.ListBookings(r.Context(), req.UserID)
+	if listErr != nil {
+		var validationErr ValidationError
+
+		if errors.As(listErr, &validationErr) {
+			helper.WriteErrorResponse(w, validationErr.Error(), http.StatusBadRequest)
+			return
+		}
+
+		helper.WriteErrorResponse(w, "something goes wrong", http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	encodeErr := json.NewEncoder(w).Encode(ListResponse{
+		Success:     "OK",
+		BookingData: list,
+	})
+
+	if encodeErr != nil {
+		log.Println("encode response error:", encodeErr)
+	}
 }
