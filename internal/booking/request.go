@@ -11,7 +11,3 @@ type ConfirmBookingRequest struct {
 type CancelBookingRequest struct {
 	UserID int64 `json:"userId"`
 }
-
-type ListBookingRequest struct {
-	UserID int64 `json:"userId"`
-}

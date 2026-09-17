@@ -61,7 +61,7 @@ func main() {
 	mux.HandleFunc("POST /events/{eventID}/seats/{seatID}/reserve", bookingHandler.ReserveSeat)
 	mux.HandleFunc("POST /bookings/{bookingID}/confirm", bookingHandler.Confirm)
 	mux.HandleFunc("DELETE /bookings/{bookingID}", bookingHandler.Cancel)
-	mux.HandleFunc("GET /bookings/{userID}/list", bookingHandler.List)
+	mux.HandleFunc("GET /users/{userID}/bookings", bookingHandler.List)
 
 	port := os.Getenv("APP_PORT")
 	log.Println("Starting server at port", port)

@@ -180,15 +180,15 @@ func (h *Handler) Cancel(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
-	var req ListBookingRequest
-	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&req); err != nil {
-		log.Println("decode error:", err)
-		helper.WriteErrorResponse(w, "incorrect json format", http.StatusBadRequest)
+	id := r.PathValue("userID")
+	userID, parseErr := strconv.ParseInt(id, 10, 64)
+	if parseErr != nil {
+		log.Println("invalid booking id:", parseErr)
+		helper.WriteErrorResponse(w, "invalid booking id", http.StatusBadRequest)
 		return
 	}
 
-	list, listErr := h.service.ListBookings(r.Context(), req.UserID)
+	list, listErr := h.service.ListBookings(r.Context(), userID)
 	if listErr != nil {
 		var validationErr ValidationError
 
@@ -197,7 +197,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		helper.WriteErrorResponse(w, "something goes wrong", http.StatusBadRequest)
+		helper.WriteErrorResponse(w, "something goes wrong", http.StatusInternalServerError)
 		return
 	}
 
