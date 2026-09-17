@@ -57,13 +57,31 @@ func (s *BookingService) ReserveSeat(ctx context.Context, eventID int64, seatId 
 	result, createErr := s.repo.CreateBooking(ctx, inputData, now, now.Add(ttl))
 	if createErr != nil {
 		log.Println(createErr)
-		delReserveErr := s.reservationStore.DeleteReserve(ctx, inputData)
+		delReserveErr := s.reservationStore.DeleteReserve(ctx, inputData.SeatID)
 		if delReserveErr != nil {
 			log.Println(delReserveErr)
 		}
 		return Result{}, InternalError{Message: "create booking service error"}
 	}
 
+	return result, nil
+}
+
+func (s *BookingService) ConfirmBooking(ctx context.Context, bookingID int64) (Result, error) {
+	if bookingID <= 0 {
+		return Result{}, ValidationError{Message: "invalid booking id"}
+	}
+
+	result, confirmErr := s.repo.ConfirmBooking(ctx, bookingID)
+	if confirmErr != nil {
+		log.Println(confirmErr)
+		return Result{}, InternalError{Message: "failed to confirm booking"}
+	}
+
+	delReserveErr := s.reservationStore.DeleteReserve(ctx, result.SeatID)
+	if delReserveErr != nil {
+		log.Println(delReserveErr)
+	}
 	return result, nil
 }
 

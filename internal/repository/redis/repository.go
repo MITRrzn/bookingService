@@ -31,8 +31,8 @@ func (r *ReservationStore) Reserve(ctx context.Context, input booking.Input, ttl
 	return reserved, nil
 }
 
-func (r *ReservationStore) DeleteReserve(ctx context.Context, input booking.Input) error {
-	key := fmt.Sprintf("reservation:%d:%d", input.EventID, input.SeatID)
+func (r *ReservationStore) DeleteReserve(ctx context.Context, seatID int64) error {
+	key := fmt.Sprintf("reservation:%d", seatID)
 
 	_, err := r.client.Del(ctx, key).Result()
 	if err != nil {

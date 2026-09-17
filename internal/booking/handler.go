@@ -88,3 +88,35 @@ func (h *Handler) ReserveSeat(w http.ResponseWriter, r *http.Request) {
 		log.Println("encode response error:", encodeErr)
 	}
 }
+
+func (h *Handler) Confirm(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("bookingID")
+	bookingId, parseErr := strconv.ParseInt(id, 10, 64)
+	if parseErr != nil {
+		log.Println("invalid bookingID id:", parseErr)
+		helper.WriteErrorResponse(w, "invalid bookingID id", http.StatusBadRequest)
+		return
+	}
+
+	result, confirmErr := h.service.ConfirmBooking(r.Context(), bookingId)
+	if confirmErr != nil {
+		var validationErr ValidationError
+		if errors.As(confirmErr, &validationErr) {
+			helper.WriteErrorResponse(w, validationErr.Error(), http.StatusBadRequest)
+			return
+		}
+
+		log.Println(confirmErr)
+		helper.WriteErrorResponse(w, "failed confirm booking", http.StatusInternalServerError)
+		return
+	}
+
+	encodeErr := json.NewEncoder(w).Encode(Response{
+		Success:     "OK",
+		BookingData: result,
+	})
+
+	if encodeErr != nil {
+		log.Println("encode response error:", encodeErr)
+	}
+}

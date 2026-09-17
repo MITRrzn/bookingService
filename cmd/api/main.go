@@ -47,7 +47,6 @@ func main() {
 	seatsRepo := seatsRepository.NewSeatRepo(db)
 	seatsService := seats.NewService(seatsRepo)
 	seatsHandler := seats.NewHandler(seatsService)
-
 	mux.HandleFunc("POST /events/{eventID}/seats", seatsHandler.AddSeatsToEvent)
 	mux.HandleFunc("GET /events/{eventID}/seats", seatsHandler.GetSeatsByEventID)
 
@@ -60,6 +59,10 @@ func main() {
 	bookingService := booking.NewService(bookingRepo, seatsRepo, reservationStore)
 	bookingHandler := booking.NewHandler(bookingService)
 	mux.HandleFunc("POST /events/{eventID}/seats/{seatID}/reserve", bookingHandler.ReserveSeat)
+	mux.HandleFunc("POST /bookings/{bookingID}/confirm", bookingHandler.Confirm)
+	//mux.HandleFunc("DELETE /bookings/{bookingID}", deleteBooking)
+
+	//mux.HandleFunc("GET /users/{userID}/bookings", bookingsList)
 
 	port := os.Getenv("APP_PORT")
 	log.Println("Starting server at port", port)
