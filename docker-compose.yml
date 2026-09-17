@@ -72,7 +72,6 @@ services:
 
     environment:
       DATABASE_URL: ${DATABASE_URL}
-      KAFKA_BROKERS: kafka:9092
 
     depends_on:
       postgres:
