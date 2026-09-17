@@ -17,7 +17,7 @@ func NewBookingRepo(db *sql.DB) *Repository {
 	}
 }
 
-func (r Repository) CreateBooking(ctx context.Context, input booking.Input, reservedAt time.Time, ttl time.Time) (booking.Result, error) {
+func (r Repository) CreateBooking(ctx context.Context, input booking.ReserveInput, reservedAt time.Time, ttl time.Time) (booking.Result, error) {
 	var result booking.Result
 
 	err := r.db.QueryRowContext(
@@ -59,14 +59,14 @@ func (r Repository) CreateBooking(ctx context.Context, input booking.Input, rese
 	return result, nil
 }
 
-func (r Repository) ConfirmBooking(ctx context.Context, bookingID int64) (booking.Result, error) {
+func (r Repository) ConfirmBooking(ctx context.Context, input booking.ConfirmInput) (booking.Result, error) {
 	var result booking.Result
 
 	err := r.db.QueryRowContext(
 		ctx,
 		`
 			UPDATE bookings SET status = $1, confirmed_at = NOW()
-			WHERE id = $2 AND status = $3 AND expires_at > NOW()
+			WHERE id = $2 AND status = $3 AND expires_at > NOW() AND user_id = $4
 			RETURNING
     		id,
     		user_id,
@@ -76,8 +76,9 @@ func (r Repository) ConfirmBooking(ctx context.Context, bookingID int64) (bookin
     		expires_at
     	`,
 		"confirmed",
-		bookingID,
+		input.BookingID,
 		"reserved",
+		input.UserID,
 	).Scan(
 		&result.BookingID,
 		&result.UserID,

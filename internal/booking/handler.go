@@ -98,7 +98,15 @@ func (h *Handler) Confirm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, confirmErr := h.service.ConfirmBooking(r.Context(), bookingId)
+	var req ReserveSeatsRequest
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&req); err != nil {
+		log.Println("decode error:", err)
+		helper.WriteErrorResponse(w, "incorrect json format", http.StatusBadRequest)
+		return
+	}
+
+	result, confirmErr := h.service.ConfirmBooking(r.Context(), bookingId, req)
 	if confirmErr != nil {
 		var validationErr ValidationError
 		var conflictErr ConflictError

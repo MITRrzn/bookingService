@@ -24,7 +24,7 @@ func NewService(repo BookingRepository, seatRepo seats.SeatRepository, reservati
 }
 
 func (s *BookingService) ReserveSeat(ctx context.Context, eventID int64, seatId int64, req ReserveSeatsRequest) (Result, error) {
-	inputData := Input{
+	inputData := ReserveInput{
 		UserID:  req.UserID,
 		EventID: eventID,
 		SeatID:  seatId,
@@ -69,12 +69,16 @@ func (s *BookingService) ReserveSeat(ctx context.Context, eventID int64, seatId 
 	return result, nil
 }
 
-func (s *BookingService) ConfirmBooking(ctx context.Context, bookingID int64) (Result, error) {
+func (s *BookingService) ConfirmBooking(ctx context.Context, bookingID int64, req ReserveSeatsRequest) (Result, error) {
 	if bookingID <= 0 {
 		return Result{}, ValidationError{Message: "invalid booking id"}
 	}
+	input := ConfirmInput{
+		UserID:    req.UserID,
+		BookingID: bookingID,
+	}
 
-	result, confirmErr := s.repo.ConfirmBooking(ctx, bookingID)
+	result, confirmErr := s.repo.ConfirmBooking(ctx, input)
 	if confirmErr != nil {
 		if errors.Is(confirmErr, sql.ErrNoRows) {
 			return Result{}, ConflictError{Message: "failed update booking"}
@@ -91,7 +95,7 @@ func (s *BookingService) ConfirmBooking(ctx context.Context, bookingID int64) (R
 	return result, nil
 }
 
-func validateInput(input Input) error {
+func validateInput(input ReserveInput) error {
 	if input.UserID <= 0 {
 		log.Println("invalid user id", input)
 		return ValidationError{Message: "invalid user id"}

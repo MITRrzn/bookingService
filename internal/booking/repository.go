@@ -6,6 +6,6 @@ import (
 )
 
 type BookingRepository interface {
-	CreateBooking(ctx context.Context, input Input, reservedAt time.Time, ttl time.Time) (Result, error)
-	ConfirmBooking(ctx context.Context, bookingID int64) (Result, error)
+	CreateBooking(ctx context.Context, input ReserveInput, reservedAt time.Time, ttl time.Time) (Result, error)
+	ConfirmBooking(ctx context.Context, input ConfirmInput) (Result, error)
 }
