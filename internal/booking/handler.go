@@ -137,3 +137,48 @@ func (h *Handler) Confirm(w http.ResponseWriter, r *http.Request) {
 		log.Println("encode response error:", encodeErr)
 	}
 }
+
+func (h *Handler) Cancel(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("bookingID")
+	bookingID, parseErr := strconv.ParseInt(id, 10, 64)
+	if parseErr != nil {
+		log.Println("invalid booking id:", parseErr)
+		helper.WriteErrorResponse(w, "invalid booking id", http.StatusBadRequest)
+		return
+	}
+
+	var req CancelBookingRequest
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&req); err != nil {
+		log.Println("decode error:", err)
+		helper.WriteErrorResponse(w, "incorrect json format", http.StatusBadRequest)
+		return
+	}
+
+	result, cancelErr := h.service.CancelBooking(r.Context(), bookingID, req)
+	if cancelErr != nil {
+		var conflictErr ConflictError
+		var internalErr InternalError
+
+		if errors.As(cancelErr, &conflictErr) {
+			helper.WriteErrorResponse(w, conflictErr.Error(), http.StatusConflict)
+			return
+		}
+		if errors.As(cancelErr, &internalErr) {
+			helper.WriteErrorResponse(w, internalErr.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+
+	encodeErr := json.NewEncoder(w).Encode(Response{
+		Success:     "OK",
+		BookingData: result,
+	})
+
+	if encodeErr != nil {
+		log.Println("encode response error:", encodeErr)
+	}
+}

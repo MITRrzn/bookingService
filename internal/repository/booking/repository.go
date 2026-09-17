@@ -93,3 +93,38 @@ func (r Repository) ConfirmBooking(ctx context.Context, input booking.ConfirmInp
 
 	return result, nil
 }
+
+func (r Repository) CancelBooking(ctx context.Context, input booking.CancelInput) (booking.Result, error) {
+	var result booking.Result
+
+	err := r.db.QueryRowContext(
+		ctx,
+		`
+			UPDATE bookings SET status = $1, confirmed_at = NOW()
+			WHERE id = $2 AND status != $3 AND expires_at > NOW() AND user_id = $4
+			RETURNING
+    		id,
+    		user_id,
+    		seat_id,
+    		status,
+    		reserved_at,
+    		expires_at
+    	`,
+		"cancelled",
+		input.BookingID,
+		"cancelled",
+		input.UserID,
+	).Scan(
+		&result.BookingID,
+		&result.UserID,
+		&result.SeatID,
+		&result.Status,
+		&result.ReservedAt,
+		&result.ExpiresAt,
+	)
+	if err != nil {
+		return booking.Result{}, err
+	}
+
+	return result, nil
+}

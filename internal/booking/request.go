@@ -7,3 +7,7 @@ type ReserveSeatsRequest struct {
 type ConfirmBookingRequest struct {
 	UserID int64 `json:"userId"`
 }
+
+type CancelBookingRequest struct {
+	UserID int64 `json:"userId"`
+}

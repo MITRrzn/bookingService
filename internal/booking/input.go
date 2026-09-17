@@ -10,3 +10,8 @@ type ConfirmInput struct {
 	UserID    int64
 	BookingID int64
 }
+
+type CancelInput struct {
+	UserID    int64
+	BookingID int64
+}

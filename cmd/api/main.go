@@ -60,7 +60,7 @@ func main() {
 	bookingHandler := booking.NewHandler(bookingService)
 	mux.HandleFunc("POST /events/{eventID}/seats/{seatID}/reserve", bookingHandler.ReserveSeat)
 	mux.HandleFunc("POST /bookings/{bookingID}/confirm", bookingHandler.Confirm)
-	//mux.HandleFunc("DELETE /bookings/{bookingID}", deleteBooking)
+	mux.HandleFunc("DELETE /bookings/{bookingID}", bookingHandler.Cancel)
 
 	//mux.HandleFunc("GET /users/{userID}/bookings", bookingsList)
 
