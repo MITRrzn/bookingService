@@ -180,3 +180,24 @@ func (r Repository) GetBookingsByUser(ctx context.Context, userID int64) ([]book
 
 	return items, nil
 }
+
+func (r Repository) IsSeatConfirmed(ctx context.Context, seatID int64) (bool, error) {
+	var isExist bool
+	err := r.db.QueryRowContext(
+		ctx,
+		`
+		SELECT EXISTS (
+		    SELECT 1
+    		FROM bookings
+    		WHERE seat_id = $1
+      		AND status = 'confirmed'
+		)
+		`, seatID,
+	).Scan(&isExist)
+
+	if err != nil {
+		return false, err
+	}
+
+	return isExist, nil
+}

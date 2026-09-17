@@ -45,6 +45,14 @@ func (s *BookingService) ReserveSeat(ctx context.Context, eventID int64, seatId 
 		}
 	}
 
+	isReseved, confirmErr := s.repo.IsSeatConfirmed(ctx, seat.ID)
+	if confirmErr != nil {
+		return Result{}, InternalError{Message: "reservation service error"}
+	}
+	if isReseved {
+		return Result{}, ConflictError{Message: "seat is already reserved"}
+	}
+
 	now := time.Now()
 	ttl := time.Minute * 5
 	reserved, reserveErr := s.reservationStore.Reserve(ctx, inputData.SeatID, ttl)

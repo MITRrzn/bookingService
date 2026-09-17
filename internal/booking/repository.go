@@ -10,4 +10,5 @@ type BookingRepository interface {
 	ConfirmBooking(ctx context.Context, input ConfirmInput) (Result, error)
 	CancelBooking(ctx context.Context, input CancelInput) (Result, error)
 	GetBookingsByUser(ctx context.Context, userID int64) ([]ListItem, error)
+	IsSeatConfirmed(ctx context.Context, seatID int64) (bool, error)
 }
