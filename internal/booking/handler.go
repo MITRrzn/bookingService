@@ -183,8 +183,8 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("userID")
 	userID, parseErr := strconv.ParseInt(id, 10, 64)
 	if parseErr != nil {
-		log.Println("invalid booking id:", parseErr)
-		helper.WriteErrorResponse(w, "invalid booking id", http.StatusBadRequest)
+		log.Println("invalid user id:", parseErr)
+		helper.WriteErrorResponse(w, "invalid user id", http.StatusBadRequest)
 		return
 	}
 

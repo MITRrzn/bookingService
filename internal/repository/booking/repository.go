@@ -153,7 +153,7 @@ func (r Repository) GetBookingsByUser(ctx context.Context, userID int64) ([]book
 
 	defer rows.Close()
 
-	var items []booking.ListItem
+	items := make([]booking.ListItem, 0)
 	for rows.Next() {
 		var item booking.ListItem
 		scanErr := rows.Scan(
