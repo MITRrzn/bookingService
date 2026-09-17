@@ -65,8 +65,8 @@ func (r Repository) ConfirmBooking(ctx context.Context, bookingID int64) (bookin
 	err := r.db.QueryRowContext(
 		ctx,
 		`
-			UPDATE bookings SET status = $1, confirmed_at = now()
-			WHERE id = $2 AND status = $3
+			UPDATE bookings SET status = $1, confirmed_at = NOW()
+			WHERE id = $2 AND status = $3 AND expires_at > NOW()
 			RETURNING
     		id,
     		user_id,
