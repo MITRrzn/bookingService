@@ -101,8 +101,15 @@ func (h *Handler) Confirm(w http.ResponseWriter, r *http.Request) {
 	result, confirmErr := h.service.ConfirmBooking(r.Context(), bookingId)
 	if confirmErr != nil {
 		var validationErr ValidationError
+		var conflictErr ConflictError
+
 		if errors.As(confirmErr, &validationErr) {
 			helper.WriteErrorResponse(w, validationErr.Error(), http.StatusBadRequest)
+			return
+		}
+
+		if errors.As(confirmErr, &conflictErr) {
+			helper.WriteErrorResponse(w, conflictErr.Error(), http.StatusConflict)
 			return
 		}
 

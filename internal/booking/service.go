@@ -3,6 +3,8 @@ package booking
 import (
 	"bookingService/internal/seats"
 	"context"
+	"database/sql"
+	"errors"
 	"log"
 	"time"
 )
@@ -74,6 +76,10 @@ func (s *BookingService) ConfirmBooking(ctx context.Context, bookingID int64) (R
 
 	result, confirmErr := s.repo.ConfirmBooking(ctx, bookingID)
 	if confirmErr != nil {
+		if errors.Is(confirmErr, sql.ErrNoRows) {
+			return Result{}, ConflictError{Message: "failed update booking"}
+		}
+
 		log.Println(confirmErr)
 		return Result{}, InternalError{Message: "failed to confirm booking"}
 	}
