@@ -10,5 +10,4 @@ type BookingRepository interface {
 	ConfirmBooking(ctx context.Context, input ConfirmInput) (Result, error)
 	CancelBooking(ctx context.Context, input CancelInput) (Result, error)
 	GetBookingsByUser(ctx context.Context, userID int64) ([]ListItem, error)
-	UpdateExpiredBookings(ctx context.Context) (int64, error)
 }

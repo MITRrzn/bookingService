@@ -2,13 +2,17 @@ package main
 
 import (
 	"bookingService/internal/database/psql"
-	bookingRepository "bookingService/internal/repository/booking"
+	"bookingService/internal/repository/expired"
 	"context"
 	"log"
 	"os/signal"
 	"syscall"
 	"time"
 )
+
+type ExpirationRepository interface {
+	UpdateExpiredBookings(ctx context.Context) (int64, error)
+}
 
 func main() {
 	ctx, stop := signal.NotifyContext(
@@ -27,7 +31,7 @@ func main() {
 			log.Printf("db close error: %v", dbCloseErr)
 		}
 	}()
-	bookingRepo := bookingRepository.NewBookingRepo(db)
+	bookingRepo := expired.NewExpiredRepo(db)
 
 	ticker := time.NewTicker(time.Second * 10)
 	defer ticker.Stop()
