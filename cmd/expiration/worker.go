@@ -10,10 +10,6 @@ import (
 	"time"
 )
 
-type ExpirationRepository interface {
-	UpdateExpiredBookings(ctx context.Context) (int64, error)
-}
-
 func main() {
 	ctx, stop := signal.NotifyContext(
 		context.Background(),
