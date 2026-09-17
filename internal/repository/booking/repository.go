@@ -182,7 +182,7 @@ func (r Repository) GetBookingsByUser(ctx context.Context, userID int64) ([]book
 }
 
 func (r Repository) UpdateExpiredBookings(ctx context.Context) (int64, error) {
-	result, execErr := r.db.ExecContext(ctx, `UPDATE bookings SET status = 'expired' WHERE status = 'reserved' AND expires_at < now()`)
+	result, execErr := r.db.ExecContext(ctx, `UPDATE bookings SET status = 'expired' WHERE status = 'reserved' AND expires_at <= now()`)
 	if execErr != nil {
 		return 0, execErr
 	}

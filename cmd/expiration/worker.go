@@ -1,4 +1,4 @@
-package expiration
+package main
 
 import (
 	"bookingService/internal/database/psql"
