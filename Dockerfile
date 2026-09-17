@@ -25,6 +25,6 @@ FROM alpine:3.22 AS expiration-worker
 
 WORKDIR /app
 
-COPY --from=builder /bin/expiration-worker ./expiration-worker
+COPY --from=builder /app/bin/expiration-worker ./expiration-worker
 
 CMD ["./expiration-worker"]
