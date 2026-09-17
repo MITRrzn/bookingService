@@ -61,6 +61,26 @@ services:
       retries: 5
 
 
+
+  expiration-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: expiration
+
+    container_name: booking-expiration-worker
+
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      KAFKA_BROKERS: kafka:9092
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    restart: unless-stopped
+
+
 volumes:
   postgres_data:
   redis_data:

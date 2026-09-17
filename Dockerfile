@@ -8,7 +8,7 @@ RUN go mod download
 COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o /app/bin/api ./cmd/api
-RUN CGO_ENABLED=0 GOOS=linux go build -o /app/bin/api ./cmd/expiration
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/bin/expiration ./cmd/expiration
 
 
 FROM alpine:3.22
