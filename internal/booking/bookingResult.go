@@ -22,3 +22,7 @@ type ListItem struct {
 	EventName     string     `json:"event_name"`
 	EventStartsAt time.Time  `json:"event_starts_at"`
 }
+
+type ExpiredBooking struct {
+	BookingID int64 `json:"booking_id"`
+}
