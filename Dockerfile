@@ -20,3 +20,11 @@ COPY --from=builder /app/bin/api ./api
 EXPOSE 8080
 
 CMD ["./api"]
+
+FROM alpine:3.22 AS expiration-worker
+
+WORKDIR /app
+
+COPY --from=builder /bin/expiration-worker ./expiration-worker
+
+CMD ["./expiration-worker"]
