@@ -98,7 +98,7 @@ func (h *Handler) Confirm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req ReserveSeatsRequest
+	var req ConfirmBookingRequest
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&req); err != nil {
 		log.Println("decode error:", err)

@@ -69,10 +69,14 @@ func (s *BookingService) ReserveSeat(ctx context.Context, eventID int64, seatId 
 	return result, nil
 }
 
-func (s *BookingService) ConfirmBooking(ctx context.Context, bookingID int64, req ReserveSeatsRequest) (Result, error) {
+func (s *BookingService) ConfirmBooking(ctx context.Context, bookingID int64, req ConfirmBookingRequest) (Result, error) {
 	if bookingID <= 0 {
 		return Result{}, ValidationError{Message: "invalid booking id"}
 	}
+	if req.UserID <= 0 {
+		return Result{}, ValidationError{Message: "invalid user id"}
+	}
+
 	input := ConfirmInput{
 		UserID:    req.UserID,
 		BookingID: bookingID,
