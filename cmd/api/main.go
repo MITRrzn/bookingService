@@ -51,10 +51,11 @@ func main() {
 	mux.HandleFunc("GET /events/{eventID}/seats", seatsHandler.GetSeatsByEventID)
 
 	redisClient, err := redisdb.GetRedisClient(ctx)
-	defer redisClient.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer redisClient.Close()
+
 	bookingRepo := bookingRepository.NewBookingRepo(db)
 	reservationStore := redis.NewReservationStore(redisClient)
 	bookingService := booking.NewService(bookingRepo, seatsRepo, reservationStore)
