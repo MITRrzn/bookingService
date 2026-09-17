@@ -99,12 +99,12 @@ func (s *BookingService) ConfirmBooking(ctx context.Context, bookingID int64, re
 	return result, nil
 }
 
-func (s *BookingService) CancelBooking(ctx context.Context, bookingID int64, req CancelBookingRequest) (Result, error) {
+func (s *BookingService) CancelBooking(ctx context.Context, bookingID int64, req CancelBookingRequest) error {
 	if bookingID <= 0 {
-		return Result{}, ValidationError{Message: "invalid booking id"}
+		return ValidationError{Message: "invalid booking id"}
 	}
 	if req.UserID <= 0 {
-		return Result{}, ValidationError{Message: "invalid user id"}
+		return ValidationError{Message: "invalid user id"}
 	}
 
 	input := CancelInput{
@@ -115,11 +115,11 @@ func (s *BookingService) CancelBooking(ctx context.Context, bookingID int64, req
 	result, cancelErr := s.repo.CancelBooking(ctx, input)
 	if cancelErr != nil {
 		if errors.Is(cancelErr, sql.ErrNoRows) {
-			return Result{}, ConflictError{Message: "failed cancel booking"}
+			return ConflictError{Message: "failed cancel booking"}
 		}
 
 		log.Println(cancelErr)
-		return Result{}, InternalError{Message: "failed to cancel booking"}
+		return InternalError{Message: "failed to cancel booking"}
 	}
 
 	delReserveErr := s.reservationStore.DeleteReserve(ctx, result.SeatID)
@@ -127,7 +127,7 @@ func (s *BookingService) CancelBooking(ctx context.Context, bookingID int64, req
 		log.Println(delReserveErr)
 	}
 
-	return result, nil
+	return nil
 }
 
 func validateInput(input ReserveInput) error {

@@ -155,10 +155,16 @@ func (h *Handler) Cancel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, cancelErr := h.service.CancelBooking(r.Context(), bookingID, req)
+	cancelErr := h.service.CancelBooking(r.Context(), bookingID, req)
 	if cancelErr != nil {
 		var conflictErr ConflictError
 		var internalErr InternalError
+		var validationErr ValidationError
+
+		if errors.As(cancelErr, &validationErr) {
+			helper.WriteErrorResponse(w, validationErr.Error(), http.StatusBadRequest)
+			return
+		}
 
 		if errors.As(cancelErr, &conflictErr) {
 			helper.WriteErrorResponse(w, conflictErr.Error(), http.StatusConflict)
@@ -171,14 +177,5 @@ func (h *Handler) Cancel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-
-	encodeErr := json.NewEncoder(w).Encode(Response{
-		Success:     "OK",
-		BookingData: result,
-	})
-
-	if encodeErr != nil {
-		log.Println("encode response error:", encodeErr)
-	}
+	w.WriteHeader(http.StatusNoContent)
 }

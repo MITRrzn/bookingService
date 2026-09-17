@@ -100,8 +100,8 @@ func (r Repository) CancelBooking(ctx context.Context, input booking.CancelInput
 	err := r.db.QueryRowContext(
 		ctx,
 		`
-			UPDATE bookings SET status = $1, confirmed_at = NOW()
-			WHERE id = $2 AND status != $3 AND expires_at > NOW() AND user_id = $4
+			UPDATE bookings SET status = $1
+			WHERE id = $2 AND status = $3 AND expires_at > NOW() AND user_id = $4
 			RETURNING
     		id,
     		user_id,
@@ -112,7 +112,7 @@ func (r Repository) CancelBooking(ctx context.Context, input booking.CancelInput
     	`,
 		"cancelled",
 		input.BookingID,
-		"cancelled",
+		"reserved",
 		input.UserID,
 	).Scan(
 		&result.BookingID,
