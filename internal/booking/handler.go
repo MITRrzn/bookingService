@@ -111,6 +111,13 @@ func (h *Handler) Confirm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	err := h.service.reservationStore.DeleteReserve(r.Context(), result.SeatID)
+	if err != nil {
+		log.Println("delete reservation error:", err)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	encodeErr := json.NewEncoder(w).Encode(Response{
 		Success:     "OK",
 		BookingData: result,

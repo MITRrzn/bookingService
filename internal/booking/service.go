@@ -45,7 +45,7 @@ func (s *BookingService) ReserveSeat(ctx context.Context, eventID int64, seatId 
 
 	now := time.Now()
 	ttl := time.Minute * 5
-	reserved, reserveErr := s.reservationStore.Reserve(ctx, inputData, ttl)
+	reserved, reserveErr := s.reservationStore.Reserve(ctx, inputData.SeatID, ttl)
 	if reserveErr != nil {
 		log.Println(reserveErr)
 		return Result{}, InternalError{Message: "reservation service error"}
