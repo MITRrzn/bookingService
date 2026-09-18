@@ -47,7 +47,7 @@ func (s *BookingService) ReserveSeat(ctx context.Context, eventID int64, seatId 
 
 	isSeatConfirmed, confirmErr := s.repo.IsSeatConfirmed(ctx, seat.ID)
 	if confirmErr != nil {
-		return Result{}, ConflictError{Message: "seat already confirmed"}
+		return Result{}, InternalError{Message: "failed check seat confirmation"}
 	}
 	if isSeatConfirmed {
 		return Result{}, ConflictError{Message: "seat is already reserved"}
