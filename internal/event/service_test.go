@@ -95,7 +95,7 @@ func TestValidateCreateEventInput(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			err := validateCreateEventInput(tt.input)
 			if tt.wantErr {
-				assert.Equal(t, err, tt.expectedErr)
+				assert.Equal(t, tt.expectedErr, err)
 			}
 			if !tt.wantErr {
 				assert.NoError(t, err)
@@ -104,7 +104,7 @@ func TestValidateCreateEventInput(t *testing.T) {
 	}
 }
 
-func TestGetActiveEventsNilEvents(t *testing.T) {
+func TestGetActiveEventsEmptyEvents(t *testing.T) {
 	repo := &mockEventRepository{
 		listEvents: []Event{},
 	}
