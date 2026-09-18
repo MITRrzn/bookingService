@@ -26,15 +26,94 @@ func (m *mockEventRepository) GetEventByID(ctx context.Context, id int64) (Event
 	return m.event, m.err
 }
 
+func TestCreateEventSuccess(t *testing.T) {
+	expectedEvent := Event{
+		ID:   1,
+		Name: "success event",
+	}
+
+	repo := &mockEventRepository{
+		event: expectedEvent,
+	}
+	service := NewService(repo)
+
+	result, err := service.CreateEvent(context.Background(), CreateEventInput{
+		Name:     "success event",
+		StartsAt: "2026-11-12 11:12:13",
+	})
+
+	assert.NoError(t, err)
+	assert.Equal(t, expectedEvent, result)
+}
+
+func TestValidateCreateEventInput(t *testing.T) {
+	cases := []struct {
+		name        string
+		input       CreateEventInput
+		wantErr     bool
+		expectedErr error
+	}{
+		{
+			name: "valid input",
+			input: CreateEventInput{
+				Name:     "test input",
+				StartsAt: "2026-11-12 11:12:13",
+			},
+			wantErr:     false,
+			expectedErr: nil,
+		},
+		{
+			name: "empty input event name",
+			input: CreateEventInput{
+				Name:     "",
+				StartsAt: "2026-11-12 11:12:13",
+			},
+			wantErr:     true,
+			expectedErr: ValidationError{Message: "empty event name"},
+		},
+		{
+			name: "short input event name",
+			input: CreateEventInput{
+				Name:     "ti",
+				StartsAt: "2026-11-12 11:12:13",
+			},
+			wantErr:     true,
+			expectedErr: ValidationError{Message: "event name is too short"},
+		},
+		{
+			name: "long input event name",
+			input: CreateEventInput{
+				Name:     "qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm",
+				StartsAt: "2026-11-12 11:12:13",
+			},
+			wantErr:     true,
+			expectedErr: ValidationError{Message: "event name is too long"},
+		},
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			err := validateCreateEventInput(tt.input)
+			if tt.wantErr {
+				assert.Equal(t, err, tt.expectedErr)
+			}
+			if !tt.wantErr {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
 func TestGetActiveEventsNilEvents(t *testing.T) {
 	repo := &mockEventRepository{
-		listEvents: nil,
+		listEvents: []Event{},
 	}
 
 	service := NewService(repo)
 	res, err := service.GetActiveEvents(context.Background())
 	assert.NoError(t, err)
-	assert.Nil(t, res)
+	assert.NotNil(t, res)
+	assert.Empty(t, res)
 }
 
 func TestGetActiveEventsDbError(t *testing.T) {
