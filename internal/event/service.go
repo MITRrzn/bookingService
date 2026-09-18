@@ -50,7 +50,7 @@ func validateCreateEventInput(input CreateEventInput) error {
 	return nil
 }
 
-func (s *EventService) GetEvents(ctx context.Context) ([]Event, error) {
+func (s *EventService) GetActiveEvents(ctx context.Context) ([]Event, error) {
 	events, err := s.repo.GetActiveEvents(ctx)
 	if err != nil {
 		return nil, err
@@ -60,5 +60,10 @@ func (s *EventService) GetEvents(ctx context.Context) ([]Event, error) {
 }
 
 func (s *EventService) GetEventByID(ctx context.Context, id int64) (Event, error) {
+	if id <= 0 {
+		return Event{}, ValidationError{
+			Message: "invalid event id",
+		}
+	}
 	return s.repo.GetEventByID(ctx, id)
 }

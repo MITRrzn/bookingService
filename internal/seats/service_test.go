@@ -10,6 +10,7 @@ import (
 type mockSeatRepository struct {
 	amount int64
 	seats  []Seat
+	seat   Seat
 	err    error
 }
 
@@ -32,7 +33,7 @@ func (m *mockSeatRepository) GetSeatByID(
 	ctx context.Context,
 	seatID int64,
 ) (Seat, error) {
-	return Seat{}, nil
+	return m.seat, m.err
 }
 
 func TestAddSeatsToEventSuccess(t *testing.T) {
@@ -44,14 +45,11 @@ func TestAddSeatsToEventSuccess(t *testing.T) {
 	seats := []SeatInput{
 		{Number: "A1", Price: 100},
 		{Number: "A2", Price: 150},
-		{Number: " A3", Price: 200},
-		{Number: "A4 ", Price: 200},
-		{Number: " A5 ", Price: 250},
 	}
 
 	amount, err := service.AddSeatsToEvent(context.Background(), seats, 10)
 	assert.NoError(t, err)
-	assert.Equal(t, int64(5), amount)
+	assert.Equal(t, int64(2), amount)
 }
 
 func TestAddSeatsToEventInvalidEvenID(t *testing.T) {

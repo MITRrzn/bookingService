@@ -88,7 +88,7 @@ func (h *Handler) GetEventByID(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetEvents(w http.ResponseWriter, r *http.Request) {
-	events, getEventsErr := h.service.GetEvents(r.Context())
+	events, getEventsErr := h.service.GetActiveEvents(r.Context())
 	if getEventsErr != nil {
 		helper.WriteErrorResponse(w, "internal server error", http.StatusInternalServerError)
 		return
