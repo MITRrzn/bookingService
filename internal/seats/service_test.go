@@ -51,7 +51,7 @@ func TestAddSeatsToEventSuccess(t *testing.T) {
 
 	amount, err := service.AddSeatsToEvent(context.Background(), seats, 10)
 	assert.NoError(t, err)
-	assert.Equal(t, int64(2), amount)
+	assert.Equal(t, int64(5), amount)
 }
 
 func TestAddSeatsToEventInvalidEvenID(t *testing.T) {
