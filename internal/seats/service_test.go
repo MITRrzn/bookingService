@@ -44,6 +44,9 @@ func TestAddSeatsToEventSuccess(t *testing.T) {
 	seats := []SeatInput{
 		{Number: "A1", Price: 100},
 		{Number: "A2", Price: 150},
+		{Number: " A3", Price: 200},
+		{Number: "A4 ", Price: 200},
+		{Number: " A5 ", Price: 250},
 	}
 
 	amount, err := service.AddSeatsToEvent(context.Background(), seats, 10)
@@ -64,6 +67,9 @@ func TestGetSeatsByEventIDInvalidID(t *testing.T) {
 	service := NewService(repo)
 
 	_, err := service.GetSeatsByEventID(context.Background(), -1)
+	if err == nil {
+		t.Fatal("expected error")
+	}
 	assert.Equal(t, ValidationError{"eventID must be greater than zero"}.Error(), err.Error())
 }
 
