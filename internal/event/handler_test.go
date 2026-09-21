@@ -40,39 +40,41 @@ func TestCreateEventHandlerErrors(t *testing.T) {
 	}{
 		{
 			name:         "invalid json",
+			body:         `{"name":`,
 			error:        nil,
-			body:         `"name": "test event", "starts_at" : "2026-05-12 11:12:13"}`,
 			expectedCode: http.StatusBadRequest,
 		},
 		{
 			name:         "validation error",
-			body:         `"name": "ab", "starts_at" : "2026-05-12 11:12:13"}`,
-			error:        nil,
+			body:         `{"name": "ab", "starts_at": "2026-05-12 11:12:13"}`,
+			error:        ValidationError{Message: "event name is too short"},
 			expectedCode: http.StatusBadRequest,
 		},
 		{
 			name:         "internal error",
-			body:         `{"name": "test", "starts_at" : "2026-05-12 11:12:13"}`,
+			body:         `{"name": "test", "starts_at": "2026-05-12 11:12:13"}`,
 			error:        errors.New("internal error"),
 			expectedCode: http.StatusInternalServerError,
 		},
 	}
 
-	service := &mockEventService{}
-
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			if tc.error != nil {
-				service = &mockEventService{
-					error: tc.error,
-				}
+			service := &mockEventService{
+				error: tc.error,
 			}
-			req := httptest.NewRequest(http.MethodPost, "/events", strings.NewReader(tc.body))
+
+			req := httptest.NewRequest(
+				http.MethodPost,
+				"/events",
+				strings.NewReader(tc.body),
+			)
 
 			handler := NewHandler(service)
-			req.Header.Set("Content-Type", "application/json")
 			recorder := httptest.NewRecorder()
+
 			handler.CreateEvent(recorder, req)
+
 			assert.Equal(t, tc.expectedCode, recorder.Code)
 		})
 	}
@@ -91,9 +93,9 @@ func TestCreateEventHandlerSuccess(t *testing.T) {
 
 	req.Header.Set("Content-Type", "application/json")
 	recorder := httptest.NewRecorder()
-	handler.GetEvents(recorder, req)
+	handler.CreateEvent(recorder, req)
 
-	assert.Equal(t, http.StatusOK, recorder.Code)
+	assert.Equal(t, http.StatusCreated, recorder.Code)
 }
 
 func TestGetEventByIDHandlerErrors(t *testing.T) {
@@ -172,14 +174,13 @@ func TestGetEventsHandlerSuccess(t *testing.T) {
 	service := &mockEventService{}
 	handler := NewHandler(service)
 
-	req.Header.Set("Content-Type", "application/json")
 	recorder := httptest.NewRecorder()
 	handler.GetEvents(recorder, req)
 
 	assert.Equal(t, http.StatusOK, recorder.Code)
 }
 
-func TestGetEventsHandlerNotFound(t *testing.T) {
+func TestGetEventsHandlerEmptyList(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/events", nil)
 
 	service := &mockEventService{
@@ -187,7 +188,6 @@ func TestGetEventsHandlerNotFound(t *testing.T) {
 	}
 	handler := NewHandler(service)
 
-	req.Header.Set("Content-Type", "application/json")
 	recorder := httptest.NewRecorder()
 	handler.GetEvents(recorder, req)
 
@@ -202,7 +202,6 @@ func TestGetEventsHandlerError(t *testing.T) {
 	}
 	handler := NewHandler(service)
 
-	req.Header.Set("Content-Type", "application/json")
 	recorder := httptest.NewRecorder()
 	handler.GetEvents(recorder, req)
 
