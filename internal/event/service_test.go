@@ -26,6 +26,19 @@ func (m *mockEventRepository) GetEventByID(ctx context.Context, id int64) (Event
 	return m.event, m.err
 }
 
+func TestCreateEventDBErr(t *testing.T) {
+	repo := &mockEventRepository{
+		err: errors.New("db err"),
+	}
+
+	service := NewService(repo)
+	_, err := service.CreateEvent(context.Background(), CreateEventInput{
+		Name:     "dr err",
+		StartsAt: "2026-11-12 11:12:13",
+	})
+	assert.Error(t, err)
+}
+
 func TestCreateEventSuccess(t *testing.T) {
 	expectedEvent := Event{
 		ID:   1,
