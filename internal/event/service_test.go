@@ -33,10 +33,11 @@ func TestCreateEventDBErr(t *testing.T) {
 
 	service := NewService(repo)
 	_, err := service.CreateEvent(context.Background(), CreateEventInput{
-		Name:     "dr err",
+		Name:     "db err",
 		StartsAt: "2026-11-12 11:12:13",
 	})
 	assert.Error(t, err)
+	assert.Equal(t, repo.err, err)
 }
 
 func TestCreateEventSuccess(t *testing.T) {
@@ -137,6 +138,7 @@ func TestGetActiveEventsDbError(t *testing.T) {
 
 	_, err := service.GetActiveEvents(context.Background())
 	assert.Error(t, err)
+	assert.Equal(t, repo.err, err)
 }
 
 func TestGetActiveEventsSuccess(t *testing.T) {
