@@ -13,18 +13,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type MockSeatService struct {
+type mockSeatService struct {
 	seats  []Seat
-	seat   Seat
 	amount int64
 	err    error
 }
 
-func (m MockSeatService) AddSeatsToEvent(ctx context.Context, seats []SeatInput, eventID int64) (int64, error) {
+func (m mockSeatService) AddSeatsToEvent(ctx context.Context, seats []SeatInput, eventID int64) (int64, error) {
 	return m.amount, m.err
 }
 
-func (m MockSeatService) GetSeatsByEventID(ctx context.Context, id int64) ([]Seat, error) {
+func (m mockSeatService) GetSeatsByEventID(ctx context.Context, id int64) ([]Seat, error) {
 	return m.seats, m.err
 }
 
@@ -89,7 +88,7 @@ func TestAddSeatsToEventHandlerErrors(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			service := &MockSeatService{err: tc.error}
+			service := &mockSeatService{err: tc.error}
 			handler := NewHandler(service)
 			mux := http.NewServeMux()
 			mux.HandleFunc("POST /events/{eventID}/seats", handler.AddSeatsToEvent)
@@ -106,7 +105,7 @@ func TestAddSeatsToEventHandlerErrors(t *testing.T) {
 }
 
 func TestAddSeatsToEventHandlerSuccess(t *testing.T) {
-	service := &MockSeatService{amount: 3}
+	service := &mockSeatService{amount: 3}
 	handler := NewHandler(service)
 
 	mux := http.NewServeMux()
@@ -141,7 +140,7 @@ func TestAddSeatsToEventHandlerSuccess(t *testing.T) {
 }
 
 func TestGetSeatsByEventIDHandlerEmpty(t *testing.T) {
-	service := &MockSeatService{seats: []Seat{}}
+	service := &mockSeatService{seats: []Seat{}}
 	handler := NewHandler(service)
 
 	mux := http.NewServeMux()
@@ -183,7 +182,7 @@ func TestGetSeatsByEventIDHandlerErrors(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			service := &MockSeatService{err: tc.error}
+			service := &mockSeatService{err: tc.error}
 			handler := NewHandler(service)
 
 			mux := http.NewServeMux()
@@ -199,7 +198,7 @@ func TestGetSeatsByEventIDHandlerErrors(t *testing.T) {
 }
 
 func TestGetSeatsByEventIDHandlerSuccess(t *testing.T) {
-	service := &MockSeatService{
+	service := &mockSeatService{
 		seats: []Seat{
 			{
 				ID:        1,
