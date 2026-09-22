@@ -102,6 +102,14 @@ func TestReserveSeatHandlerErrors(t *testing.T) {
 			expectedCode: http.StatusBadRequest,
 		},
 		{
+			name:         "validation error, incorrect seatID",
+			body:         `{"userId": 1}`,
+			seatID:       1,
+			eventID:      1,
+			error:        ConflictError{Message: "failed update booking"},
+			expectedCode: http.StatusConflict,
+		},
+		{
 			name:         "internal server error",
 			body:         `{"userId": 1}`,
 			seatID:       1,
@@ -198,6 +206,13 @@ func TestConfirmHandlerErrors(t *testing.T) {
 			bookingID:    "1",
 			error:        ValidationError{Message: "invalid user id"},
 			expectedCode: http.StatusBadRequest,
+		},
+		{
+			name:         "conflict error",
+			body:         `{"userId": 0}`,
+			bookingID:    "1",
+			error:        ConflictError{Message: "failed update booking"},
+			expectedCode: http.StatusConflict,
 		},
 		{
 			name:         "internal server error",
@@ -385,6 +400,22 @@ func TestListHandlerErrors(t *testing.T) {
 			assert.Equal(t, tc.expectedCode, recorder.Code)
 		})
 	}
+}
+
+func TestListHandlerEmpty(t *testing.T) {
+	service := &mockBookingService{
+		items: []ListItem{},
+	}
+
+	handler := NewHandler(service)
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /users/{userID}/bookings", handler.List)
+
+	req := httptest.NewRequest(http.MethodGet, "/users/1/bookings", nil)
+	recorder := httptest.NewRecorder()
+	mux.ServeHTTP(recorder, req)
+
+	assert.Equal(t, http.StatusOK, recorder.Code)
 }
 
 func TestListHandlerSuccess(t *testing.T) {
