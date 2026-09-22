@@ -102,7 +102,7 @@ func TestReserveSeatHandlerErrors(t *testing.T) {
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name:         "validation error, incorrect seatID",
+			name:         "conflict error",
 			body:         `{"userId": 1}`,
 			seatID:       1,
 			eventID:      1,
@@ -300,7 +300,7 @@ func TestCancelErrors(t *testing.T) {
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name:         "failed cancel, booking not found",
+			name:         "conflict error",
 			body:         `{"userId": 0}`,
 			bookingID:    "1",
 			error:        ConflictError{Message: "failed cancel booking"},
