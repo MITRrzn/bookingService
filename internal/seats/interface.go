@@ -1,0 +1,8 @@
+package seats
+
+import "context"
+
+type ServiceInterface interface {
+	AddSeatsToEvent(ctx context.Context, seats []SeatInput, eventID int64) (int64, error)
+	GetSeatsByEventID(ctx context.Context, id int64) ([]Seat, error)
+}
