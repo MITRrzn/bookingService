@@ -11,7 +11,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /app/bin/api ./cmd/api
 RUN CGO_ENABLED=0 GOOS=linux go build -o /app/bin/expiration-worker ./cmd/expiration
 
 
-FROM alpine:3.22
+FROM alpine:3.22 as api
 
 WORKDIR /app
 

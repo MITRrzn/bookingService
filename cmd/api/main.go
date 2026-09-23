@@ -35,6 +35,12 @@ func main() {
 		}
 	}()
 
+	redisClient, err := redisdb.GetRedisClient(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer redisClient.Close()
+
 	mux := http.NewServeMux()
 
 	eventRepo := eventRepository.NewEventRepo(db)
@@ -49,12 +55,6 @@ func main() {
 	seatsHandler := seats.NewHandler(seatsService)
 	mux.HandleFunc("POST /events/{eventID}/seats", seatsHandler.AddSeatsToEvent)
 	mux.HandleFunc("GET /events/{eventID}/seats", seatsHandler.GetSeatsByEventID)
-
-	redisClient, err := redisdb.GetRedisClient(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer redisClient.Close()
 
 	bookingRepo := bookingRepository.NewBookingRepo(db)
 	reservationStore := redis.NewReservationStore(redisClient)
