@@ -23,6 +23,14 @@ services:
       redis:
         condition: service_healthy
 
+  migrate:
+    image: migrate/migrate
+    volumes:
+      - ./migrations:/migrations
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   postgres:
     image: postgres:17-alpine
     container_name: booking-postgres

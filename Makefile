@@ -9,11 +9,11 @@ docker-up:
 migrate-up:
 	docker compose run --rm migrate \
 		-path /migrations \
-		-database "postgres://postgres:postgres@localhost:5433/booking?sslmode=disable" \
+		-database "postgres://postgres:postgres@postgres:5432/booking?sslmode=disable" \
 		up
 
 migrate-down:
 	docker compose run --rm migrate \
 		-path /migrations \
-		-database "postgres://postgres:postgres@localhost:5433/booking?sslmode=disable" \
+		-database "postgres://postgres:postgres@postgres:5432/booking?sslmode=disable" \
 		down --all

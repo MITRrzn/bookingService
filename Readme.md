@@ -130,14 +130,6 @@ curl --location 'http://localhost:8081/bookings/2/confirm' \
 <details><summary>DELETE http://localhost:8081/bookings/{bookingID} - отмена бронирования, статус canceled</summary>
 
 ```bash
-curl --location 'http://localhost:8081/users/1/bookings'
-```
-
-</details>
-
-<details><summary>DELETE http://localhost:8081/bookings/{bookingID} - отмена бронирования, статус canceled</summary>
-
-```bash
 curl --location --request DELETE 'http://localhost:8081/bookings/3' \
 --header 'Content-Type: application/json' \
 --data '{
